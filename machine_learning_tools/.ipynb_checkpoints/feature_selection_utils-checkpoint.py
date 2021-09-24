@@ -96,7 +96,7 @@ def best_subset_k(
         fit_model = model.fit(X[list(winning_features)],y)
         return winning_features,fit_model
     else:
-        return fit_model
+        return winning_features
 
 import sklearn.feature_selection as fs
 from sklearn.feature_selection import chi2, f_regression

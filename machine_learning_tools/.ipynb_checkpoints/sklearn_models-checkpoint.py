@@ -78,6 +78,7 @@ def Lasso(
     **kwargs):
     
     return linear_model.Lasso(
+        alpha=alpha,
         fit_intercept = fit_intercept
     )
     
