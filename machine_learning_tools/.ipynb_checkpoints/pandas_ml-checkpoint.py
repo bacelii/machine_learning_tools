@@ -80,6 +80,9 @@ def center_df(df):
 
 def hstack(dfs):
     return pd.concat(dfs,axis = 1)
+
+def split_df_by_target(df,target_name):
+    return [x for _, x in df.groupby(target_name)]
     
     
 import pandas_ml as pdml

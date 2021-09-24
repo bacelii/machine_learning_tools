@@ -65,6 +65,13 @@ def MSE(y_true,y_pred=None,model=None,X = None):
     
     return mean_squared_error(y_true, y_pred)
 
+def accuracy(X,y):
+    """
+    Returns the accuracy of a classifier
+    
+    """
+    return clf.score(df_X, df_y)
+
 from sklearn.model_selection import train_test_split
 def train_val_test_split(
     X,

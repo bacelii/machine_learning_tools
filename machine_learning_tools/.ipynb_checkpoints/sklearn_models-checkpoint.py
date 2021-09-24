@@ -340,3 +340,15 @@ def coef_summary(feature_names,
         print(f"Intercept: {model.intercept_}")
     for f,c in zip(feature_names,coef_):
         print(f"{f}:{c}")
+        
+        
+# =========================== LINEAR CLASSIFIERS ================
+def classes(clf):
+    return clf.classes_
+
+def n_features_in_(clf):
+    return clf.n_features_in_
+
+def LogisticRegression(**kwargs):
+    return linear_model.LogisticRegression(**kwargs)
+
