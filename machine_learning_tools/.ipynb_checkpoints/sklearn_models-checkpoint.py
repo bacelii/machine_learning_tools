@@ -15,6 +15,8 @@ model.alpha_ --> the LaGrange multiplier after the fit
 """
 import pandas_ml as pdml
 
+def clf_name(clf):
+    return str(clf).split("(")[0]
 
 
 # ------- Linear Regression ------------

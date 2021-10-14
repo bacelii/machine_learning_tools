@@ -83,6 +83,57 @@ def hstack(dfs):
 
 def split_df_by_target(df,target_name):
     return [x for _, x in df.groupby(target_name)]
+
+
+
+# ========= pandas visualizations ==============
+import matplotlib.pyplot as plt
+def plot_df_x_y_with_std_err(
+    df,
+    x_column,
+    y_column=None,
+    std_err_column=None,
+    log_scale_x = True,
+    log_scale_y = True,
+    verbose = False
+    ):
+    """
+    Purpose: to plot the x and y 
+    columns where the y column has
+    an associated standard error with it
+    
+    Example: 
+    import pandas_ml as pdml
+    pdml.plot_df_x_y_with_std_err(
+    df,
+        x_column= "C",
+    )
+    """
+    
+    fig,ax = plt.subplots()
+
+    if y_column is None:
+        y_column = [k for k in df.columns if "mean" in k][0]
+
+    if std_err_column is None:
+        std_err_column = [k for k in df.columns if "std_err" in k][0]
+
+    if verbose:
+        print(f"Using std_err_column = {std_err_column}")
+
+    df.plot(x_column,
+            y_column,
+            yerr = std_err_column,
+            ax = ax)
+    
+    if log_scale_x:
+        ax.set_xscale("log")
+    if log_scale_y:
+        ax.set_yscale("log")
+    ax.set_xlabel(x_column)
+    ax.set_ylabel(y_column)
+    
+    plt.show()
     
     
 import pandas_ml as pdml

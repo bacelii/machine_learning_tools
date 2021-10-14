@@ -54,16 +54,27 @@ def load_boston():
               target_name="MEDV")
 
 
-from sklearn.metrics import mean_squared_error
-def MSE(y_true,y_pred=None,model=None,X = None):
+from sklearn.metrics import mean_squared_error, log_loss
+def MSE(y_true,y_pred=None,model=None,X = None,clf=None):
     """
     Purpose: Will calculate the MSE of a model
     
     """
+    if model is None:
+        model = clf
     if y_pred is None:
-        y_pred = model.predict(X)
+        y_pred = clf.predict(X)
     
     return mean_squared_error(y_true, y_pred)
+
+def logistic_log_loss(clf,X,y_true):
+    """
+    Computes the Log loss, aka logistic loss or cross-entropy loss.
+    on a model
+    """
+    y_pred = clf.predict_proba(X)
+    return log_loss(y_true, y_pred)
+    
 
 def accuracy(clf,X,y):
     """
@@ -91,6 +102,7 @@ def train_val_test_split(
     val_size = None,
     verbose = False,
     random_state = None, #can pass int to get reproducable results
+    return_dict = False,
     ):
     """
     Purpose: To split the data into 
@@ -134,7 +146,16 @@ def train_val_test_split(
         if verbose:
             print(f"For Train/Val/Test split of {train_size}/{test_size}"
                   f" = {len(X_train)}/{len(X_test)}")
-        return X_train, X_test, y_train, y_test
+        if return_dict:
+            data_splits = dict(
+            X_train=X_train,
+             X_test=X_test,
+             y_train=y_train,
+             y_test=y_test
+            )
+            return data_splits
+        else:
+            return X_train, X_test, y_train, y_test
 
     
     val_size_adj = val_size/(1 - test_size)
@@ -148,7 +169,18 @@ def train_val_test_split(
     if verbose:
         print(f"For Train/Val/Test split of {train_size}/{val_size}/{test_size}"
               f" = {len(X_train)}/{len(X_val)}/{len(X_test)}")
-    return X_train,X_val,X_test,y_train,y_val,y_test
+    if return_dict:
+        data_splits = dict(
+        X_train=X_train,
+         X_val=X_val,
+         X_test=X_test,
+         y_train=y_train,
+         y_val=y_val,
+         y_test=y_test
+        )
+        return data_splits
+    else:
+        return X_train,X_val,X_test,y_train,y_val,y_test
 
 import pandas as pd
 from sklearn.model_selection import KFold 
@@ -193,14 +225,17 @@ def k_fold_df_split(
 
     return folds_test_train
 
-def optimal_parameter_from_mse_kfold_df(
+def optimal_parameter_from_kfold_df(
     df,
     parameter_name = "k",
     columns_prefix = "mse_fold",
     higher_param_higher_complexity = True,
     d = True,
     verbose = False,
-    return_df = False
+    return_df = False,
+    standard_error_buffer = False,
+    plot_loss = True,
+    **kwargs, #mostly arguments for plotting
                                  ):
     """
     Purpose: Will find the optimal parameter 
@@ -244,9 +279,19 @@ ret_df
         optimal_k = best_subset_df.query(f"{mean_col} <= {mean_opt + std_err_opt}")[parameter_name].max()
         
     if verbose:
-        print(f"mean_opt= {mean_opt}",f"std_err_opt = {std_err_opt}",f"mse cutoff = {mean_opt + std_err_opt}")
-        print(f"optimal_k= {optimal_k}")
+        print(f"mean_opt= {mean_opt}",f"std_err_opt = {std_err_opt}",f"{columns_prefix} cutoff = {mean_opt + std_err_opt}")
+        print(f"optimal_{parameter_name} = {optimal_k}")
     
+    
+    if plot_loss:
+        import pandas_ml as pdml
+        pdml.plot_df_x_y_with_std_err(
+        best_subset_df,
+        x_column= parameter_name,
+        y_column = mean_col,
+        std_err_column = std_error_col,
+        **kwargs
+        )
     
     if return_df:
         return optimal_k,best_subset_df
@@ -284,5 +329,212 @@ def random_regression_with_informative_features(
         return X,y,coef
     else:
         return X,y
+    
+import pandas as pd
+from tqdm.notebook import tqdm
+def CV_optimal_param_1D(
+    parameter_options,
+    clf_function,
+    
+    #arguments for loss function
+    loss_function,
+    
+    #cross validation parameters
+    n_splits = 5,
+    
+    # parameters for splits
+    data_splits = None,
+    X = None,
+    y = None,
+    test_size =0.2,
+    val_size = 0.2,
+
+    #parameters for the type of classifier
+    
+    clf_parameters = dict( ),
+
+    
+    
+    
+    #arguments for the determination of the optimal parameter
+    standard_error_buffer = True,
+    plot_loss = False,
+    
+    #arguments for return
+    return_data_splits = False,
+
+    verbose = False,
+    ):
+
+    """
+    Purpose: To Run Cross Validation by Hand with Specific
+    - Dataset
+    - Model Type
+    - 1D Parameter Grid to Search over
+    - Loss function to measure
+    - Method of evaluating the best loss function
+
+    Pseudocode: 
+    0) Define the parameter space to iterate over
+    1) Split the Data into,test,training and validation
+    2) Combine the validation and training datasets
+    in order to do cross validation
+    3) Compute the datasets for each cross validation 
+
+    For every parameter option:
+        For every K fold dataset:
+            Train the model on the dataset
+            Measure the MSE or another loss for that model
+            Store the certain loss
+        Find the average loss and the standard error on the loss
+
+    Pick the optimal parameter by one of the options:
+    a) Picking the parameter with the lowest average loss
+    b) Picking the parameter value that is the least complex model
+     that is within one standard deviation of the parameter with the
+     minimum average loss
+     
+     Example: 
+     clf,data_splits = sklu.CV_optimal_param_1D(
+        parameter_options = dict(C = np.array([10.**(k) for k in np.linspace(-4,3,25)])),
+
+        X = X,
+        y = y,
+
+        #parameters for the type of classifier
+        clf_function = linear_model.LogisticRegression,
+        clf_parameters = dict(
+            penalty = "l1",
+             solver="saga",
+             max_iter=10000, ),
+
+        #arguments for loss function
+        loss_function = sklu.logistic_log_loss,
+
+        #arguments for the determination of the optimal parameter
+        standard_error_buffer = True,
+        plot_loss = True,
+
+
+        #arguments for return
+        return_data_splits = True,
+
+        verbose = True,
+        )
+
+    """
+
+    if data_splits is None:
+        if X is None or y is None:
+            raise Exception("X and y must be set if data_splits is None")
+        
+        (X_train,
+         X_val,
+         X_test,
+         y_train,
+         y_val,
+         y_test) = sklu.train_val_test_split(
+            X,
+            y,
+            test_size = test_size,
+            val_size = val_size,
+            verbose = verbose)
+
+        data_splits = dict(
+        X_train=X_train,
+         X_val=X_val,
+         X_test=X_test,
+         y_train=y_train,
+         y_val=y_val,
+         y_test=y_test
+        )
+
+    if "X_val" in data_splits.items():
+        X_train = data_splits["X_train"]
+        X_val = data_splits["X_val"]
+        X_test = data_splits["X_test"]
+
+        y_train = data_splits["y_train"]
+        y_val = data_splits["y_val"]
+        y_test = data_splits["y_test"]
+
+        X_train_val = pd.concat([X_train,X_val])
+        y_train_val = pd.concat([y_train,y_val])
+
+    else:
+        X_train_val = data_splits["X_train"]
+        X_test = data_splits["X_test"]
+
+        y_train_val = data_splits["y_train"]
+        y_test = data_splits["y_test"]
+
+
+    fold_dfs = sklu.k_fold_df_split(
+        X_train_val,
+        y_train_val,
+        n_splits = n_splits)
+
+    cv_dicts = []
+    for param_name,C_options in parameter_options.items():
+        for c in tqdm(C_options):
+            curr_dict = {param_name:c}
+            for fold_idx,fold_data in fold_dfs.items():
+
+                #setting classifier type
+                p_dict = clf_parameters.copy()
+                p_dict.update({param_name:c})
+                clf = clf_function(**p_dict)
+
+                #training the classifier
+                clf.fit(fold_data["X_train"],
+                       fold_data["y_train"])
+
+                #computes the loss for the classifier
+                loss = loss_function(clf = clf,
+                                    X = fold_data["X_test"],
+                                    y_true = fold_data["y_test"],)
+
+                curr_dict[f"{loss_function.__name__}_fold_{fold_idx}"] = loss
+
+
+            cv_dicts.append(curr_dict)
+
+    # compiles the results
+    df = pd.DataFrame.from_records(cv_dicts)
+
+
+
+    # best parameter using the 1 Standard Error Trick
+    opt_C, kfold_stat_df = sklu.optimal_parameter_from_kfold_df(
+        df,
+        parameter_name = param_name,
+        columns_prefix = loss_function.__name__,
+        return_df = True,
+        standard_error_buffer = standard_error_buffer,
+        verbose = verbose,
+        plot_loss = plot_loss,
+
+    )
+
+    # train the final model on the optimal parameter:
+    p_dict = clf_parameters.copy()
+    p_dict.update({param_name:opt_C})
+    clf = clf_function(**p_dict)
+    clf.fit(X_train_val,y_train_val)
+
+    # print the statistics of the optimal parameter
+    if verbose:
+        print(f"\n Cross Validation Statistics")
+        print(f"{clf} Hand optimal C = {opt_C}")
+
+        hand_opt_loss_val = loss_function(clf=clf,X=X_train_val,y_true=y_train_val)
+        hand_opt_loss_test = loss_function(clf=clf,X=X_test,y_true=y_test)
+        print(f"hand_opt_loss_val= {hand_opt_loss_val}")
+        print(f"hand_opt_loss_test= {hand_opt_loss_test}\n")
+
+    if return_data_splits:
+        return clf,data_splits
+    else:
+        return clf
 
 import sklearn_utils as sklu
