@@ -65,12 +65,23 @@ def MSE(y_true,y_pred=None,model=None,X = None):
     
     return mean_squared_error(y_true, y_pred)
 
-def accuracy(X,y):
+def accuracy(clf,X,y):
     """
     Returns the accuracy of a classifier
     
     """
-    return clf.score(df_X, df_y)
+#     try:
+#         X = X.to_numpy()
+#     except:
+#         pass
+    
+#     try:
+#         y = y.to_numpy()
+#     except:
+#         pass
+    
+    
+    return clf.score(X, y)
 
 from sklearn.model_selection import train_test_split
 def train_val_test_split(
@@ -187,7 +198,7 @@ def optimal_parameter_from_mse_kfold_df(
     parameter_name = "k",
     columns_prefix = "mse_fold",
     higher_param_higher_complexity = True,
-    standard_error_buffer = True,
+    d = True,
     verbose = False,
     return_df = False
                                  ):

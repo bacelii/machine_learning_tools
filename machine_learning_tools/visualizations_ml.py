@@ -4,6 +4,20 @@ import matplotlib_ml as mu
 import matplotlib.pyplot as plt
 
 
+def color_list_for_y(y,color_list = None):
+    try:
+        y = y.to_numpy()
+    except:
+        pass
+    y_unique = np.unique(y)
+    
+    if color_list is None:
+        color_list =  mu.generate_non_randon_named_color_list(len(y_unique))
+        
+    palette = {k:v for k,v in zip(y_unique,color_list)}
+    return [palette[k] for k in y]
+        
+    
 def meshgrid_for_plot(
     axes_min_default = -10,
     axes_max_default = 10,
@@ -72,11 +86,12 @@ def meshgrid_for_plot(
         return output_grid
     
 from matplotlib.colors import ListedColormap
+import pandas_ml as pdml
 def contour_map_for_2D_classifier(
     clf,
     axes_min_default = -10,
     axes_max_default = 10,
-    axes_step_default = 0.1,
+    axes_step_default = 0.01,
     axes_min_max_step_dict = None,
 
     figure_width = 10,
@@ -91,8 +106,14 @@ def contour_map_for_2D_classifier(
     #arguments for classes color type
     map_fill_colors = None,
 
+    # ------ arguments for plotting training points --------
     #arguments for other scatters to plot
-    scatter_colors = None,     
+    training_df = None,
+    training_df_class_name = "class",
+    training_df_feature_names = None,
+    X = None,
+    y = None,
+    scatter_colors=["darkorange","c"],
     ):
     
     """
@@ -124,10 +145,13 @@ def contour_map_for_2D_classifier(
                     if type(k) == str  else k
                     for k in features_to_plot]
 
-    if color_type == "classes":
-        if map_fill_colors is None:
-            map_fill_colors = mu.generate_non_randon_named_color_list(len(labels_list))
-        cmap_light = ListedColormap(map_fill_colors)
+    #if color_type == "classes":
+    if map_fill_colors is None:
+        map_fill_colors = mu.generate_non_randon_named_color_list(len(labels_list))
+        
+    cmap_light = ListedColormap(map_fill_colors)
+    
+
 
     if scatter_colors is None:
         scatter_colors = map_fill_colors
@@ -176,6 +200,31 @@ def contour_map_for_2D_classifier(
     else:
         raise Exception(f"Unimplemented color_type = {color_type}")
 
+    if training_df is not None or X is not None:
+        if X is None:
+            X,y = pdml.X_y(training_df,training_df_class_name)
+        
+        if training_df_feature_names is not None:
+            try:
+                X = X[training_df_feature_names]
+            except:
+                X = X[training_df_feature_names]
+            
+        try:
+            X = X.to_numpy()
+        except:
+            pass
+        ax.scatter(X[:,0],
+                    X[:,1],
+                    c = vml.color_list_for_y(y,scatter_colors),
+                    alpha = 0.5,
+                    )
+        ax.set_xlim(np.min(X[:,0])-0.5,np.max(X[:,0])+0.5,)
+        ax.set_ylim(np.min(X[:,1])-0.5,np.max(X[:,1])+0.5,)
+        
+    ax.set_xlabel(training_df_feature_names[0])
+    ax.set_ylabel(training_df_feature_names[1])
+        
     plt.show()
 
 def plot_df_scatter_3d_classification(
@@ -240,5 +289,46 @@ def plot_df_scatter_3d_classification(
     ax.set_title(" vs. ".join(np.flip(feature_names)))
     mu.set_legend_outside_plot(ax)
     ax.legend()
+    
+    
+#Plotting function
+def plot_svm_kernels(clf, X, y, X_test=None,title = None):
+#     import warnings
+#     import logging,sys
+#     warnings.filterwarnings('ignore')
+#     logging.disable(sys.maxsize)
+    
+    #Plot
+    plt.figure()
+    plt.clf()
+    plt.scatter(X[:, 0], X[:, 1], c=y, zorder=10, cmap=plt.cm.Paired,
+                edgecolor='k', s=20)
+
+    # Circle out the test data
+    if X_test is not None:
+        plt.scatter(X_test[:, 0], X_test[:, 1], s=80, facecolors='none',
+                    zorder=10, edgecolor='k')
+
+    plt.axis('tight')
+    x_min = X[:, 0].min()
+    x_max = X[:, 0].max()
+    y_min = X[:, 1].min()
+    y_max = X[:, 1].max()
+
+    XX, YY = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
+    Z = clf.decision_function(np.c_[XX.ravel(), YY.ravel()])
+
+    # Put the result into a color plot
+    Z = Z.reshape(XX.shape)
+    plt.pcolormesh(XX, YY, Z > 0, cmap=plt.cm.Paired)
+    plt.contour(XX, YY, Z, colors=['k', 'k', 'k'],
+                linestyles=['--', '-', '--'], levels=[-.5, 0, .5])
+
+    if title is not None:
+        plt.title(title)
+    else:
+        plt.title(str(clf.kernel))
+    plt.show()
+    
     
 import visualizations_ml as vml

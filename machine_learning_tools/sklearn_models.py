@@ -342,7 +342,7 @@ def coef_summary(feature_names,
         print(f"{f}:{c}")
         
         
-# =========================== LINEAR CLASSIFIERS ================
+# =========================== CLASSIFIERS ================
 def classes(clf):
     return clf.classes_
 
@@ -350,5 +350,22 @@ def n_features_in_(clf):
     return clf.n_features_in_
 
 def LogisticRegression(**kwargs):
+    """
+    This one you can set the coefficients of the linear classifier
+    """
     return linear_model.LogisticRegression(**kwargs)
 
+from sklearn import svm
+
+def SVC(kernel="rbf",
+        C = 1,
+        gamma = "scale",
+        **kwargs):
+    """
+    SVM with the possibilities of adding kernels
+    
+    """
+    return svm.SVC(kernel=kernel,
+                   C = C,
+                   gamma = gamma,
+                   **kwargs)
