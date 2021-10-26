@@ -2,6 +2,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas_ml as pdml
+import pandas as pd
 
 figsize_default = (10,10)
 
@@ -31,9 +32,26 @@ def hist(array,
     fig,ax = plt.subplots(figsize=figsize)
     return sns.distplot(array,bins = bins,ax = ax,**kwargs)
 
-def scatter_2D(x,y,alpha=0.5,**kwargs):
-    return sns.jointplot(x,y,kind = "scatter",joint_kws={'alpha':alpha},**kwargs)
-
+def scatter_2D(x,y,
+               x_label="feature_1",
+               y_label = "feature_2",
+               title = None,
+               alpha=0.5,**kwargs):
+    data = pd.DataFrame({
+    x_label: x,
+    y_label: y,
+    })
+    joint_obj = sns.jointplot(x=x_label,
+                         y=y_label,
+                         data = data,
+                         kind = "scatter",
+                         joint_kws={'alpha':alpha},
+                         **kwargs)
+    if title is not None:
+        joint_obj.ax_marg_x.set_title(f"{title}")
+        
+    return joint_obj
+    
 def pairplot(df,**kwargs):
     return sns.pairplot(df,**kwargs)
 

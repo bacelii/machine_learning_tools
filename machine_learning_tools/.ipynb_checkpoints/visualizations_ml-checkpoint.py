@@ -208,7 +208,7 @@ def contour_map_for_2D_classifier(
             try:
                 X = X[training_df_feature_names]
             except:
-                X = X[training_df_feature_names]
+                X# = X[training_df_feature_names]
             
         try:
             X = X.to_numpy()
