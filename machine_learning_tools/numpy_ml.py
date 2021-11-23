@@ -973,4 +973,27 @@ def random_shuffled_indexes_for_array(array):
     idx_to_process = np.arange(0,len(array))
     return nu.randomly_shuffle_array(idx_to_process)
 
+
+import itertools
+def all_choose_1_combinations_form_dict_values(parameter_dict,
+                                        verbose = False):
+    """
+    Purpose: To generate a list of dictinoaries that 
+    encompass all the possible parameter settings defined
+    by the possible parameter settings in the dictionary
+    
+    Pseudocode: 
+    
+    
+    """
+    
+    param_keys = list(parameter_dict.keys())
+    total_list = [nu.convert_to_array_like(k) for k in parameter_dict.values()]
+    all_param_comb = [p for p in itertools.product(*total_list)]
+    if verbose:
+        print(f"# of combinations = {len(all_param_comb)}")
+    
+    return [{k:v for k,v in zip(param_keys,l)} for l in all_param_comb]
+
+
 import numpy_ml as nu

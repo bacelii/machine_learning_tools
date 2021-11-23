@@ -135,5 +135,68 @@ def plot_df_x_y_with_std_err(
     
     plt.show()
     
+def csv_to_df(csv_filepath):
+    return pd.read_csv(csv_filepath) 
+    
+from pathlib import Path
+def df_to_csv(df,
+              output_filename="df.csv",
+              output_folder = "./",
+              file_suffix = ".csv",
+            output_filepath = None,
+             verbose = False,
+             return_filepath = True,
+              compression = "infer",
+             index = True,):
+    """
+    Purpose: To export a dataframe as a csv
+    file
+    """
+    if output_filepath is None:
+        output_folder = Path(output_folder)
+        output_filename = Path(output_filename)
+        output_filepath = output_folder / output_filename
+
+    output_filepath = Path(output_filepath)
+    
+    if str(output_filepath.suffix) != file_suffix:
+            output_filepath = Path(str(output_filepath) + file_suffix)
+    
+    output_path = str(output_filepath.absolute())
+    if verbose: 
+        print(f"Output path: {output_path}")
+        
+    df.to_csv(str(output_filepath.absolute()), sep=',',index=index,compression=compression)
+    
+    if return_filepath:
+        return output_path
+
+def df_to_gzip(df,
+              output_filename="df.gzip",
+              output_folder = "./",
+            output_filepath = None,
+             verbose = False,
+             return_filepath = True,
+             index = False,):
+    """
+    Purpose: Save off a compressed version of dataframe
+    (usually 1/3 of the size)
+    
+    """
+    return df_to_csv(df,
+              output_filename=output_filename,
+              output_folder = output_folder,
+              file_suffix = ".gzip",
+            output_filepath = output_filepath,
+             verbose = verbose,
+             return_filepath = return_filepath,
+              compression = "gzip",
+             index = index,)
+
+def gzip_to_df(filepath):
+    return pd.read_csv(filepath,
+                       compression='gzip', header=0, sep=',', quotechar='"', error_bad_lines=False)
+
+    
     
 import pandas_ml as pdml

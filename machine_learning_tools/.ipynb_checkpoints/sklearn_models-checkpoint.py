@@ -371,3 +371,409 @@ def SVC(kernel="rbf",
                    C = C,
                    gamma = gamma,
                    **kwargs)
+
+
+#================= ============== Tree based models ================= ==============
+from sklearn import ensemble 
+from sklearn import tree 
+
+ensemble.RandomForestClassifier
+ensemble.BaggingClassifier
+ensemble.AdaBoostClassifier
+tree.DecisionTreeClassifier
+
+
+def DecisionTreeClassifier(
+    splitter="best",
+    criterion = "gini",
+    max_depth= None,
+    max_features = None,
+    random_state=None,
+    class_weight = None,
+    **kwargs
+    ):
+    
+    """
+    
+    
+    DecisiionTreeClassifier parameters:
+
+    ------- DecisionTree specific parameters ----------
+    splitter: default="best" how the split will be chosen
+    - "best": best split
+    - "random": best random split
+
+    ------- generic tree parameters ---------
+    criterion : how the best split is determined
+    - 'gini'
+    - 'entropy'
+    max_depth: int , max depth of trees
+    max_features: number of features to look at when doing best split
+    - 'auto':sqrt of number of n_features
+    - 'sqrt'
+    - log2
+    - int: specifying the exact numbe of features
+    - float: secifying the percentage of total n_features
+    - None: always has maximum number of features
+    class_weight: dict,list of dict, "balanced"  will add weighting to class decision
+    - "balanced" will automatically balance based on composition of y
+
+
+    """
+    
+    return tree.DecisionTreeClassifier(
+    splitter=splitter,
+    criterion = criterion,
+    max_depth= max_depth,
+    max_features = max_features,
+    random_state=random_state,
+    class_weight = class_weight,
+    **kwargs
+    )
+
+
+def BaggingClassifier(
+    base_estimator = None,
+    n_estimators= 10,
+    max_samples = 1.0,
+    max_features = 1.0,
+    bootstrap = True,
+    bootstrap_features = False,
+    oob_score = False,
+    random_state = True,
+    verbose = True,
+    **kwargss):
+
+    """
+    Purpose: 
+    1) Fits classifiers based on random subsets of the original data
+    (done using boostrapping method that uses sampling with replacement)
+    2) Aggregates the individual predictions of classifiers 9voting or average)
+
+    Application: to reduce varaince of an estimator
+
+    Baggin Classifier parameters
+
+    --- Bagging specific parameters -------
+    base_estimator: Object, default = DecisionTreeClassifier
+        the model used that will be trained many times
+    n_estimators: int , 
+        Number of estimators ensemble will use
+    max_samples: int/float, default = 1.0
+    - int: only will draw that many samples
+    - float: that proportion of saples will draw
+    max_features: int/float, default = 1.0
+        number of features drawn when creating the training set for that iteration
+
+    boostrap: bool, default=True
+        whether samples are drawn with replacement or not
+    boostrap_features: bool, default = False
+        to draw features with replacement
+    oob_score: bool, default=False
+        to use a out o bag samples to calculate a generalization error as train
+    random_state: int, default = None
+    verbose: int, default = None
+
+    """
+    return ensemble.BaggingClassifier(
+    base_estimator = base_estimator,
+    n_estimators= n_estimators,
+    max_samples = max_samples,
+    max_features = max_features,
+    bootstrap = bootstrap,
+    bootstrap_features = bootstrap_features,
+    oob_score = oob_score,
+    random_state = random_state,
+    verbose = verbose,
+    **kwargss
+    )
+
+
+
+def RandomForestClassifier(
+    n_estimators=30,
+    criterion = "gini",
+    max_depth= None,
+    max_features = "auto",
+    bootstrap = True,
+    oob_score = True,
+    random_state=None,
+    verbose = False,
+    max_samples = None,
+    class_weight = None,
+    **kwargs
+    ):
+    
+    """
+    Purpose: Where the number of features trained on is a subset of overall
+    and the samples trained on are a boostrapped samples
+    
+    ---------RandomForrest specific parameters---------: 
+    n_estimators: number o trees to use in the forest
+    bootstrap: bool(True): whether bootstrap sapling are used to build trees
+    (if not then the whole dataset is used)
+
+    oob_score: bool (False): whether to use out-of =-bag samples to estimate the generalization
+    score
+    
+    max_samples: Number of samples to draw if doing bootstrapping
+    verbose
+    
+    
+    ------- generic tree parameters ---------
+    criterion : how the best split is determined
+    - 'gini'
+    - 'entropy'
+    max_depth: int , max depth of trees
+    max_features: number of features to look at when doing best split
+    - 'auto':sqrt of number of n_features
+    - 'sqrt'
+    - log2
+    - int: specifying the exact numbe of features
+    - float: secifying the percentage of total n_features
+    - None: always has maximum number of features
+    class_weight: dict,list of dict, "balanced"  will add weighting to class decision
+    - "balanced" will automatically balance based on composition of y
+    
+    
+    
+    Example: 
+    clf = sklm.RandomForestClassifier(max_depth=5)
+    clf.fit(X_train,y_train)
+    print(sklu.accuracy(clf,X_test,y_test),clf.oob_score_)
+    _ = sklm.feature_importance(clf_for,return_std=True,plot=True)
+    """
+    
+    return ensemble.RandomForestClassifier(
+        n_estimators=n_estimators,
+        criterion = criterion,
+        max_depth= max_depth,
+        max_features = max_features,
+        bootstrap = bootstrap,
+        oob_score = oob_score,
+        random_state=random_state,
+        verbose = verbose,
+        max_samples = max_samples,
+        **kwargs
+    )
+
+
+def AdaBoostClassifier(
+    base_estimator=None,
+    n_estimators = 50,
+    learning_rate = 1.0,
+    random_state = None,
+    **kwargs):
+
+    """
+    Purpose: To perform boosting sequential ensembles
+    where the subsequent models are trained on weighted 
+    data where data missed in previous mehtod are more highly weighted
+
+    ---- AdaBoost specific parameters -----
+    base_estimator: Object, default=None
+        the estimator used for the ensemble, 
+        if None then it is Tree with max_depth = 1
+    n_estimators: int, default = 50
+        maximum number of estimators used before termination, but
+        learning could be terminated earlier (just max possible)
+    learning_rate: float, default = 1.0
+        weight applied to each classifier at each iteration, 
+        so the lower the learning rate the more models would have
+    random_state: int
+        controls seed given to each base_estimator at each boosting iteration
+        (AKA the base estimator has to have a random_state arpument)
+
+
+    attributes: 
+    base_estimator_:Object
+        base from which estimators were built
+    estimators_: list of objects
+        list of the fitted sub estimators
+    estimator_weights_: array of floats
+        the weights given for each estimator
+    estimator_errors_: array of floats
+        classification error for each estimator in the  
+    feature_importances_: array of floats:
+        impurity-based feautre importances
+    n_features_in_:
+        number of features seend during fit
+    feature_names_in:
+        names of the features seen during the fit
+
+    """
+    return ensemble.AdaBoostClassifier(
+        base_estimator=base_estimator,
+        n_estimators = n_estimators,
+        learning_rate = learning_rate,
+        random_state = random_state,
+        **kwargs)
+
+
+def GradientBoostingClassifier(
+    loss="deviance",
+    learning_rate = 0.1,
+    n_estimators=100,
+    subsample=1.0,
+    max_depth = 3,
+    random_state=None,
+    max_features=None,
+    verbose = 0,
+    ):
+    """
+    GradientBoosting
+
+    Purpose: to optimize a certain loss function. Idea is to 
+    fit classifiers that go downhill in the gradient but not fit all the way.
+    This makes the earning slower and harder to overfit
+
+    Procedure:
+    For many stages
+    1) regression tres are fit on the negative gradient of the loss
+    2) only wegihts the classifiers by a learning rate so not learn to quickly
+    3) continue to the next stage and learn on the subsequent gradients
+
+    Application: Usually pretty good for overfitting
+
+    --- GradientBoosting specific parameters ---
+    loss: str, default = "deviance"
+        the loss function that should be optimized
+        - "deviance": logistic regression loss (with probabilistic outputs)
+        - "exponential": this is ust the adaboost algorithm
+    learning_rate: float default = 0.1,
+        how much each of the estimators contributes
+    n_estimators: int, default = 100
+    subsample:float, default = 1.0
+        if less than 1 then will do stochastic gradient boosting where not look
+        at all of the samples
+
+
+    ------- generic tree parameters ---------
+    max_depth: int , max depth of trees
+    max_features: number of features to look at when doing best split
+    - 'auto':sqrt of number of n_features
+    - 'sqrt'
+    - log2
+    - int: specifying the exact numbe of features
+    - float: secifying the percentage of total n_features
+    - None: always has maximum number of features
+
+
+    What it returns: 
+    n_stimators: int
+        number estimators made 
+    feature_importances: array
+        impurity based feature importances
+    oob_importovement: 
+        the improvement in loss on the out of bag sample relative to previous iteration
+        (ONLY AVAILABLE IF SUBSAMPLE < 1.0)
+    train_score: array
+        ith train score is the deviance of model iteration i on the in-bag sample 
+        (if subsample == 1, then this is the deviance on the training data)
+    estimators: array of DecisionTreeregression
+
+    """
+
+    ensemble.GradientBoostingClassifier(
+    loss=loss,
+    learning_rate = learning_rate,
+    n_estimators=n_estimators,
+    subsample=subsample,
+    max_depth = max_depth,
+    random_state=random_state,
+    max_features=max_features,
+    verbose = verbose,
+    )
+
+def oob_score(clf):
+    """
+    Purpose: Returns the out of bag error
+    for ensembles that use bootstrapping method
+    """
+    return clf.oob_score_
+
+
+def is_ensemble(clf):
+    if "ensemble" in str(type(clf)):
+        return True
+    else:
+        return False
+
+import visualizations_ml as vml
+import time
+from sklearn.inspection import permutation_importance
+def feature_importances(
+    clf,
+    verbose = True,
+    plot = False,
+    feature_names = None,
+    return_std = False,
+    method="impurity_decrease",
+    #arguments for permutation
+    X_permuation=None,
+    y_permutation=None,
+    n_repeats=10,
+    random_state= None,
+    
+    **kwargs
+    ):
+    """
+    Purpose: Will return the feature importance
+    of a tree based classifier
+    
+    sklm.feature_importances(clf,
+                        #method=,
+                        verbose = True,
+                        plot=True,
+                        X_permuation=X_test,
+                        y_permutation=y_test,
+                        n_repeats=1)
+    
+    """
+
+    st = time.time()
+    
+    if verbose:
+        print(f"Using method: {method}")
+    
+    if method =="impurity_decrease":
+        importances = clf.feature_importances_
+        if not sklm.is_ensemble(clf):
+            std = np.zeros(clf.n_features_in_)
+        else:
+            std = np.std([tree.feature_importances_ for tree in clf.estimators_],axis=0)
+    elif method=="permutation":
+        if X_permuation is None or y_permutation is None:
+            raise Exception("Trying to do permutation feature importance but no training data")
+        result = permutation_importance(
+            clf,
+            X_permuation,
+            y_permutation,
+            n_repeats=n_repeats,
+            random_state= random_state,
+        )
+        importances = result.importances_mean
+        std = result.importances_std
+    else:
+        raise Exception(f"Unimplemented importance method: {method}")
+        
+    elapsed_time = time.time() - st
+    if verbose:
+        print(f"Time for importances = {elapsed_time}")
+
+    if return_std:
+        std = sklm.feature_importance_std(clf)
+        
+    if plot:
+        vml.plot_feature_importance(clf,feature_names,
+                                    title = f"Feature Importance \n({method})",
+                                    importances=importances,
+                                    std=std,
+                                    **kwargs)
+    
+    if return_std:
+        return importances,std
+    else:
+        return importances
+    
+import sklearn_models as sklm

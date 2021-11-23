@@ -330,5 +330,43 @@ def plot_svm_kernels(clf, X, y, X_test=None,title = None):
         plt.title(str(clf.kernel))
     plt.show()
     
+import pandas as pd
+import numpy as np
+import sklearn_models as sklm
+def plot_feature_importance(clf,
+                            feature_names = None,
+                           sort_features=True,
+                           n_features_to_plot=20,
+                           title="Feature Importance",
+                            importances=None,
+                            std=None,
+                           **kwargs):
+    """
+    Purpose: Will plot the feature importance of a classifier
+    """
+    if importances is None or std is None:
+        importances,std = sklm.feature_importances(clf,**kwargs)
+        
+    if feature_names is None:
+        feature_names= np.array([f"feature_{i}" for i in range(len(importances))])
+    
+    if sort_features:
+        sort_idx = np.flip(np.argsort(importances))
+        importances = importances[sort_idx]
+        feature_names = feature_names[sort_idx]
+    
+    df = pd.DataFrame(dict(importances=importances,index=feature_names,std=std))
+    
+    #doing the filtering of the features
+    if n_features_to_plot is not None and len(df)>n_features_to_plot:
+        df = df.iloc[:n_features_to_plot,:]
+
+    #doing the plotting
+    fig,ax = plt.subplots()
+    df.plot.bar(x="index",y="importances",yerr="std",ax=ax)
+    ax.set_title(title)
+    fig.tight_layout()
+    plt.show()
+    
     
 import visualizations_ml as vml
