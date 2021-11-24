@@ -62,5 +62,31 @@ def hist2D(x_df,y_df,n_bins = 100,cbar=True,**kwargs):
              cbar=True,
                  **kwargs
            )
+    
+
+from matplotlib.colors import LogNorm
+def heatmap(array,
+            cmap = sns.cm.rocket_r,
+            logscale = True,
+            title=None,
+             ax = None,
+            **kwargs):
+    """
+    Purpose: Will make a heatmap
+    """
+    if ax is None:
+        fig,ax = plt.subplots(1,1)
+    if logscale:
+        sns.heatmap(array, square=True, norm=LogNorm(),ax=ax,cmap=cmap)
+    else:
+        sns.heatmap(array, square=True,ax=ax,cmap=cmap)
+    
+    if title is not None:
+        ax.set_title(title)
+    
+    return ax
+    
+    
+    
 
 import seaborn_ml as sml

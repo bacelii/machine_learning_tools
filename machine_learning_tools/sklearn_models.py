@@ -431,7 +431,7 @@ def DecisionTreeClassifier(
     **kwargs
     )
 
-
+tree_parameters = ["max_depth"]
 def BaggingClassifier(
     base_estimator = None,
     n_estimators= 10,
@@ -442,7 +442,9 @@ def BaggingClassifier(
     oob_score = False,
     random_state = True,
     verbose = True,
-    **kwargss):
+    
+    max_depth= None,
+    **kwargs):
 
     """
     Purpose: 
@@ -475,6 +477,15 @@ def BaggingClassifier(
     verbose: int, default = None
 
     """
+    tree_dict = dict()
+    for k,v in kwargs.items():
+        if k in tree_parameters:
+            tree_dict[k] = v
+    
+    if len(tree_dict) > 0 and base_estimator is None:
+        base_estimator = sklm.DecisionTreeClassifier(**tree_dict)
+    
+    
     return ensemble.BaggingClassifier(
     base_estimator = base_estimator,
     n_estimators= n_estimators,
@@ -485,7 +496,7 @@ def BaggingClassifier(
     oob_score = oob_score,
     random_state = random_state,
     verbose = verbose,
-    **kwargss
+    **kwargs
     )
 
 
@@ -543,6 +554,9 @@ def RandomForestClassifier(
     print(sklu.accuracy(clf,X_test,y_test),clf.oob_score_)
     _ = sklm.feature_importance(clf_for,return_std=True,plot=True)
     """
+    
+    if max_samples is not None and max_samples >= 1:
+        max_samples = None
     
     return ensemble.RandomForestClassifier(
         n_estimators=n_estimators,
@@ -602,6 +616,18 @@ def AdaBoostClassifier(
         names of the features seen during the fit
 
     """
+    tree_dict = dict()
+    for k,v in kwargs.items():
+        if k in tree_parameters:
+            tree_dict[k] = kwargs[k]
+            
+    for k in tree_dict.keys():
+        del kwargs[k]
+
+    
+    if len(tree_dict) > 0 and base_estimator is None:
+        base_estimator = sklm.DecisionTreeClassifier(**tree_dict)
+        
     return ensemble.AdaBoostClassifier(
         base_estimator=base_estimator,
         n_estimators = n_estimators,
@@ -674,7 +700,7 @@ def GradientBoostingClassifier(
 
     """
 
-    ensemble.GradientBoostingClassifier(
+    return ensemble.GradientBoostingClassifier(
     loss=loss,
     learning_rate = learning_rate,
     n_estimators=n_estimators,
@@ -737,11 +763,23 @@ def feature_importances(
         print(f"Using method: {method}")
     
     if method =="impurity_decrease":
-        importances = clf.feature_importances_
+        try:
+            importances = clf.feature_importances_
+        except:
+            importances = np.mean([
+                tree.feature_importances_ for tree in clf.estimators_
+            ], axis=0)
+            
         if not sklm.is_ensemble(clf):
             std = np.zeros(clf.n_features_in_)
         else:
-            std = np.std([tree.feature_importances_ for tree in clf.estimators_],axis=0)
+            try:
+                std = np.std([tree.feature_importances_ for tree in clf.estimators_],axis=0)
+            except:
+                std = np.std([
+                    tree.feature_importances_ for tree in clf.estimators_
+                ], axis=0)
+                
     elif method=="permutation":
         if X_permuation is None or y_permutation is None:
             raise Exception("Trying to do permutation feature importance but no training data")
@@ -760,9 +798,6 @@ def feature_importances(
     elapsed_time = time.time() - st
     if verbose:
         print(f"Time for importances = {elapsed_time}")
-
-    if return_std:
-        std = sklm.feature_importance_std(clf)
         
     if plot:
         vml.plot_feature_importance(clf,feature_names,

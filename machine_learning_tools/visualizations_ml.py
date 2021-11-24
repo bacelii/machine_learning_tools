@@ -345,7 +345,9 @@ def plot_feature_importance(clf,
     Purpose: Will plot the feature importance of a classifier
     """
     if importances is None or std is None:
-        importances,std = sklm.feature_importances(clf,**kwargs)
+        importances,std = sklm.feature_importances(clf,
+                                                   return_std=True,
+                                                   **kwargs)
         
     if feature_names is None:
         feature_names= np.array([f"feature_{i}" for i in range(len(importances))])
@@ -367,6 +369,38 @@ def plot_feature_importance(clf,
     ax.set_title(title)
     fig.tight_layout()
     plt.show()
+    
+    
+    
+from IPython.display import SVG
+from graphviz import Source
+from IPython.display import display   
+
+from sklearn.tree import export_graphviz
+
+def plot_decision_tree(clf,
+                      feature_names,
+                      class_names=None,
+                      max_depth=None):
+    """
+    Purpose: Will show the 
+    
+    
+    """
+    if class_names is None:
+        class_names = list(clf.classes_)
+    
+    graph = Source(export_graphviz(clf,
+                        max_depth=max_depth
+      , out_file=None
+      , feature_names=feature_names
+      , class_names=class_names
+      , filled = True
+      , precision=6))
+
+    print(f"clf.classes_ = {clf.classes_}")
+    display(SVG(graph.pipe(format='svg')))
+    
     
     
 import visualizations_ml as vml
