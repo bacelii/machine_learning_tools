@@ -233,18 +233,20 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy_ml as nu
 def plot_projected_data(data_proj,
-                        labels=None,
+                        labels=None, # should be a number
                         axis_prefix="Proj",
                        text_to_plot_dict=None,
+                        text_to_plot_individual = None,
                        #cmap = plt.cm.nipy_spectral,
                         cmap = "viridis",
                        figsize=(10,10),
-                       scatter_alpha=0.5):
+                       scatter_alpha=0.5,
+                       title = ""):
     """
     To plot the PC projection in 3D
     
     """
-
+    
     X_proj = data_proj
     y = labels
     if y is None:
@@ -264,6 +266,7 @@ def plot_projected_data(data_proj,
     ax.set_xlabel(f"{axis_prefix} 1")
     ax.set_ylabel(f"{axis_prefix} 2")
     ax.set_zlabel(f"{axis_prefix} 3")
+    ax.set_title(f"{title}")
     
     if text_to_plot_dict is not None: 
         for name, coord in text_to_plot_dict.items():
@@ -276,6 +279,16 @@ def plot_projected_data(data_proj,
                       horizontalalignment='center',
                       c = "white",
                       bbox=dict(alpha=.2, edgecolor='b', facecolor='b'))
+    if text_to_plot_individual is not None:
+        for coord,name in zip(X_proj,text_to_plot_individual):
+            ax.text3D(coord[0],
+                      coord[1],
+                      coord[2],
+                      name,
+                      horizontalalignment='center',
+                      c = "white",
+                      bbox=dict(alpha=.2, edgecolor='b', facecolor='b'))
+            
 
     plt.show()
     
@@ -283,7 +296,8 @@ def plot_projected_data_2D(data_proj,labels=None,axis_prefix="Proj",
                        text_to_plot_dict=None,
                        cmap = plt.cm.nipy_spectral,
                        figsize=(10,10),
-                          scatter_alpha=0.5):
+                          scatter_alpha=0.5,
+                          title = ""):
     """
     To plot the PC projection in 3D
     
@@ -304,6 +318,7 @@ def plot_projected_data_2D(data_proj,labels=None,axis_prefix="Proj",
 #     ax.set_ticklabels([])
     ax.set_xlabel(f"{axis_prefix} 1")
     ax.set_ylabel(f"{axis_prefix} 2")
+    ax.set_title(f"{title}")
     
     if text_to_plot_dict is not None: 
         for name, coord in text_to_plot_dict.items():
@@ -315,6 +330,8 @@ def plot_projected_data_2D(data_proj,labels=None,axis_prefix="Proj",
                       horizontalalignment='center',
                       c = "white",
                       bbox=dict(alpha=.2, edgecolor='b', facecolor='b'))
+            
+    
 
     plt.show()
     

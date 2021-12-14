@@ -353,7 +353,80 @@ def dendrogram_HC(model,p = 10000,
         plt.show()
         
 
+import networkx as nx
+def dendrogram_graph_from_model(model):
+    """
+    Purpose: will return the dendrogram as a grpah object
+    so you can navigate it
+    """
+    edges = np.vstack([np.array([[i+model.n_leaves_,k1],
+     [i+model.n_leaves_,k2]]) for i,(k1,k2) in enumerate(model.children_)])
+    
+    G = nx.DiGraph()
+    G.add_edges_from(edges)
+    
+    return G
+    
+    
+import networkx_utils as xu
+
+def closest_k_nodes_on_dendrogram(
+    node,
+    k,
+    G = None,
+    model=None,
+    verbose = False):
+    """
+    Purpose: Want to find the first k nodes that
+    are close to a node through a dendrogram
+    """
+
+    if G is None:
+        G = clu.dendrogram_graph_from_model(model)
+
+    return xu.closest_k_leaf_neighbors_in_binary_tree(
+        G,
+        node=node,
+        k = k,
+        verbose = verbose
+    )
+
+
+from sklearn.cluster import AgglomerativeClustering, FeatureAgglomeration
+import clustering_ml as clu
+def closet_k_neighbors_from_nierarchical_clustering(
+    X,
+    node_name,
+    row_names,
+    k,
+    n_components = 3,
+    verbose = False,
+    ):
+
+    text_ids = np.array(row_names)
+
+    model = AgglomerativeClustering(
+        distance_threshold=0, 
+        n_clusters=None,
+        linkage="ward")
+
+    model = model.fit(X)
+    
+    G = clu.dendrogram_graph_from_model(model)
+
+    graph_node = np.where(text_ids == node_name)[0][0]
+
+    closest_neighbors = clu.closest_k_nodes_on_dendrogram(
+        node = graph_node,
+        k = k,
+        G = G,
+        verbose = verbose
+    )
+
+
+    return [str(k) for k in text_ids[closest_neighbors]]
+    
         
 from sklearn.cluster import AgglomerativeClustering
 
-import clustering_utils as clu
+import clustering_ml as clu
