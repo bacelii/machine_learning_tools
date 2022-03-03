@@ -87,12 +87,15 @@ def meshgrid_for_plot(
     
 from matplotlib.colors import ListedColormap
 import pandas_ml as pdml
+import numpy_ml as nu
 def contour_map_for_2D_classifier(
     clf,
     axes_min_default = -10,
     axes_max_default = 10,
     axes_step_default = 0.01,
     axes_min_max_step_dict = None,
+    axes_limit_buffers = 0,
+    
 
     figure_width = 10,
     figure_height = 10,
@@ -111,6 +114,7 @@ def contour_map_for_2D_classifier(
     training_df = None,
     training_df_class_name = "class",
     training_df_feature_names = None,
+    feature_names = ("feature_1","feature_2"),
     X = None,
     y = None,
     scatter_colors=["darkorange","c"],
@@ -137,7 +141,12 @@ def contour_map_for_2D_classifier(
 
     features_to_plot = (0,1) #could be indexes or feature name
 
-    labels_list = clf.classes_
+    labels_list = getattr(clf,"classes_",[0,1])
+
+    axes_limit_buffers = nu.convert_to_array_like(axes_limit_buffers)
+    if len(axes_limit_buffers) == 1:
+        axes_limit_buffers = np.concatenate([axes_limit_buffers,axes_limit_buffers])
+    
 
 
 
@@ -157,16 +166,30 @@ def contour_map_for_2D_classifier(
         scatter_colors = map_fill_colors
 
 
+    if X is None:
+        output_grid  = vml.meshgrid_for_plot(
+                    axes_min_default = axes_min_default,
+                    axes_max_default = axes_max_default,
+                    axes_step_default = axes_step_default,
+                    axes_min_max_step_dict = axes_min_max_step_dict,
+            clf = clf,
+            return_combined_coordinates=False
 
-    output_grid  = vml.meshgrid_for_plot(
-                axes_min_default = axes_min_default,
-                axes_max_default = axes_max_default,
-                axes_step_default = axes_step_default,
-                axes_min_max_step_dict = axes_min_max_step_dict,
-        clf = clf,
-        return_combined_coordinates=False
+                    )
+    else:
+        n_mesh_grid_pts = 100
+        x_min,x_max = X.iloc[:,0].min()-axes_limit_buffers[0],X.iloc[:,0].max()+axes_limit_buffers[0]
+        y_min,y_max = X.iloc[:,1].min()-axes_limit_buffers[1],X.iloc[:,1].max()+axes_limit_buffers[1]
+        output_grid = vml.meshgrid_for_plot(
+            axes_min_max_step_dict = {0:dict(axis_min = x_min,axis_max = x_max,axis_step = (x_max-x_min)/n_mesh_grid_pts),
+                                    1:dict(axis_min = y_min,axis_max = y_max,axis_step = (y_max-y_min)/n_mesh_grid_pts)},
+            clf = clf,
+            return_combined_coordinates=False,
+        )
+        
+        
 
-                )
+        
 
     xx,yy = output_grid[features_idx[0]],output_grid[features_idx[1]]
     grid = np.vstack([k.ravel() for k in output_grid]).T #makes into n by n_features array
@@ -209,6 +232,8 @@ def contour_map_for_2D_classifier(
                 X = X[training_df_feature_names]
             except:
                 X# = X[training_df_feature_names]
+        
+        feature_names = list(X.columns)
             
         try:
             X = X.to_numpy()
@@ -219,11 +244,12 @@ def contour_map_for_2D_classifier(
                     c = vml.color_list_for_y(y,scatter_colors),
                     alpha = 0.5,
                     )
-        ax.set_xlim(np.min(X[:,0])-0.5,np.max(X[:,0])+0.5,)
-        ax.set_ylim(np.min(X[:,1])-0.5,np.max(X[:,1])+0.5,)
+        ax.set_xlim(x_min,x_max)
+        ax.set_ylim(y_min,y_max)
         
-    ax.set_xlabel(training_df_feature_names[0])
-    ax.set_ylabel(training_df_feature_names[1])
+    
+    ax.set_xlabel(feature_names[0])
+    ax.set_ylabel(feature_names[1])
         
     plt.show()
 
