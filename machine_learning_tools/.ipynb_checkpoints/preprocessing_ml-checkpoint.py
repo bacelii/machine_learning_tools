@@ -21,7 +21,7 @@ available_scalars = dict(
 )
 
 
-def get_scaler(scaler):
+def get_scaler(scaler="normal_dist"):
     """
     Purpose: To return the appropriate scalar option
     
@@ -35,10 +35,12 @@ def get_scaler(scaler):
     
 import pandas_ml as pdml
 import pandas as pd
-def scale_df(df,
-             scaler="StandardScaler",
-            target_name =  None,
-            verbose = False):
+def scale_df(
+    df,
+    scaler="StandardScaler",
+    scaler_trained = None,
+    target_name =  None,
+    verbose = False):
     """
     Purpose: 
     To apply a preprocessing scalar

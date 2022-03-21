@@ -429,4 +429,41 @@ def closet_k_neighbors_from_nierarchical_clustering(
         
 from sklearn.cluster import AgglomerativeClustering
 
+
+# --------------- metrics for evaluating clusters -------------
+from sklearn import metrics
+def purity_score(labels_true,labels_pred,verbose = False):
+    # compute contingency matrix (also called confusion matrix)
+    contingency_matrix = metrics.cluster.contingency_matrix(labels_true, labels_pred)
+    # return purity
+    purity =  np.sum(np.amax(contingency_matrix, axis=0)) / np.sum(contingency_matrix) 
+    
+    if verbose:
+        print(f"purity = {purity}")
+        
+    return purity
+
+from sklearn.metrics import cluster 
+def normalized_mutual_info_score(
+    labels_true,
+    labels_pred,
+    verbose = False):
+    norm_mut_info =  cluster.normalized_mutual_info_score(labels_true=labels_true,labels_pred=labels_pred)
+    
+    if verbose:
+        print(f"norm_mut_info = {norm_mut_info}")
+        
+    return norm_mut_info
+
+def adjusted_rand_score(
+    labels_true,
+    labels_pred,
+    verbose = False):
+    adjusted_rand_score =  cluster.adjusted_rand_score(labels_true=labels_true,labels_pred=labels_pred)
+    
+    if verbose:
+        print(f"adjusted_rand_score = {adjusted_rand_score}")
+        
+    return adjusted_rand_score
+
 import clustering_ml as clu

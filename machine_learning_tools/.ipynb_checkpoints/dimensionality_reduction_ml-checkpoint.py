@@ -7,7 +7,11 @@ from matplotlib.ticker import MaxNLocator
 
 # =================== PCA Development in Neurosignal Processing ========
 
-def plot_variance_explained(data_var,title=None, title_prefix=None):
+def plot_variance_explained(
+    data_var=None,
+    pca_model = None,
+    title=None,
+    title_prefix=None):
     """
     Create a square root eigenvalue plot from pca analysis
     
@@ -19,7 +23,8 @@ def plot_variance_explained(data_var,title=None, title_prefix=None):
         title = title_prefix + ": " + title
         
     fig,ax = plt.subplots(1,1)
-    
+    if data_var is None:
+        data_var = pca_model.explained_variance_ratio_
     if type(data_var) == dict:
         data_var = data_var["percent_variance_explained"]
     
@@ -234,9 +239,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy_ml as nu
 def plot_projected_data(data_proj,
                         labels=None, # should be a number
-                        axis_prefix="Proj",
+                        axis_prefix="",
                        text_to_plot_dict=None,
                         text_to_plot_individual = None,
+                        use_labels_as_text_to_plot = False,
                        #cmap = plt.cm.nipy_spectral,
                         cmap = "viridis",
                        figsize=(10,10),
@@ -263,15 +269,22 @@ def plot_projected_data(data_proj,
     ax.w_xaxis.set_ticklabels([])
     ax.w_yaxis.set_ticklabels([])
     ax.w_zaxis.set_ticklabels([])
-    ax.set_xlabel(f"{axis_prefix} 1")
-    ax.set_ylabel(f"{axis_prefix} 2")
-    ax.set_zlabel(f"{axis_prefix} 3")
+    ax.set_xlabel(f"{axis_prefix} Proj 1")
+    ax.set_ylabel(f"{axis_prefix} Proj 2")
+    ax.set_zlabel(f"{axis_prefix} Proj 3")
     ax.set_title(f"{title}")
+    
+    if use_labels_as_text_to_plot:
+        text_to_plot_dict = dict()
+        for k in set(labels):
+            text_to_plot_dict[k] = k#X_proj[y==k,:3]
     
     if text_to_plot_dict is not None: 
         for name, coord in text_to_plot_dict.items():
             if not nu.is_array_like(coord):
+                
                 coord = X_proj[y==coord].mean(axis=0)
+            #print(f"{name} coord = {coord}")
             ax.text3D(coord[0],
                       coord[1],
                       coord[2],
@@ -279,6 +292,9 @@ def plot_projected_data(data_proj,
                       horizontalalignment='center',
                       c = "white",
                       bbox=dict(alpha=.2, edgecolor='b', facecolor='b'))
+            
+    
+        
     if text_to_plot_individual is not None:
         for coord,name in zip(X_proj,text_to_plot_individual):
             ax.text3D(coord[0],
