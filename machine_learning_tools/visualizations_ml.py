@@ -254,7 +254,7 @@ def contour_map_for_2D_classifier(
     plt.show()
 
 def plot_df_scatter_3d_classification(
-    df,
+    df=None,
     target_name = None,
     feature_names = None,
     
@@ -265,6 +265,8 @@ def plot_df_scatter_3d_classification(
     axis_append = "",
     
     verbose = False,
+    X=None,
+    y = None,
     ):
     """
     Purpose: To plot features in 3D
@@ -281,6 +283,12 @@ def plot_df_scatter_3d_classification(
         "ipr_eig_xz_max_95"
     ])
     """
+    if target_name is None:
+        target_name = "target"
+    if df is None:
+        df = pdml.df_from_X_y(X,y,target_name = target_name)
+    
+    
     fig = plt.figure()
     fig.set_size_inches(figure_width,figure_height)
     ax = fig.add_subplot(111, projection = "3d")
@@ -315,6 +323,8 @@ def plot_df_scatter_3d_classification(
     ax.set_title(" vs. ".join(np.flip(feature_names)))
     mu.set_legend_outside_plot(ax)
     ax.legend()
+    
+    return ax
     
     
 #Plotting function

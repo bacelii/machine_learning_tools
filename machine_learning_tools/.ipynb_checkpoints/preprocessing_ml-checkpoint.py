@@ -67,6 +67,8 @@ def scale_df(
     scaler_df = pd.DataFrame(scaler_df,columns = df_features)
     scaler_df
     
+    if target_name is not None:
+        scaler_df[target_name] = df[target_name]
     return scaler_df
 
 def non_negative_df(df):

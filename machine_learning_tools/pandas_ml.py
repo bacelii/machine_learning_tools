@@ -20,6 +20,23 @@ def n_features(df,target_name=None):
 def X_y(df,target_name):
     return pdml.df_no_target(df,target_name),df[target_name]
 
+def df_from_X_y(
+    X,
+    y,
+    data_column_names = "feature",
+    target_name = "target"):
+    """
+    Ex: 
+    pdml.df_from_X_y(X_trans,y,target_name = "cell_type")
+    """
+    
+    f = pd.DataFrame(X)
+    f.columns = [f"{data_column_names}_{i}" for i in range(X.shape[1])]
+    f[target_name] = y
+    
+    return f
+    
+
 def feature_names(df,target_name=None):
     return np.array(list(pdml.df_no_target(df,target_name).columns))
 
