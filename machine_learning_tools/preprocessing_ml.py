@@ -74,4 +74,20 @@ def scale_df(
 def non_negative_df(df):
     return df - df.min()
 
+"""
+How to do encoding and one hot encoding
+
+encoding_col = ["Emergent Indication","Stenosis Group","Azizi Classification"]
+tranformers = dict()
+for k in encoding_col:
+    le = preprocessing.LabelEncoder()
+    le.fit(df_filt[k])
+    df_filt[k] = le.transform(df_filt[k])
+    tranformers[k] = copy(le)
+    
+one_hot_columns = ["Ethnicity","Etiology of SVC Occlusion","Azizi Type "]
+new_dfs = [pd.get_dummies(df_filt[[k]],drop_first=False) for k in one_hot_columns]
+
+"""
+
 import preprocessing_ml as preml
