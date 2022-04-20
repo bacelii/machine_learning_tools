@@ -59,16 +59,20 @@ def scale_df(
 
     scaler = preml.get_scaler(scaler)
 
+    import numpy as np
     if verbose:
         print(f"scaler = {scaler}")
 
     df_features = pdml.feature_names(df,target_name)
     scaler_df = scaler.fit_transform(df[df_features])
     scaler_df = pd.DataFrame(scaler_df,columns = df_features)
-    scaler_df
+    
     
     if target_name is not None:
+#         print(f"{df_cp[target_name].groupby(['cell_type_fine']).count()}")
+        df = df.reset_index()
         scaler_df[target_name] = df[target_name]
+        
     return scaler_df
 
 def non_negative_df(df):
@@ -89,5 +93,6 @@ one_hot_columns = ["Ethnicity","Etiology of SVC Occlusion","Azizi Type "]
 new_dfs = [pd.get_dummies(df_filt[[k]],drop_first=False) for k in one_hot_columns]
 
 """
+
 
 import preprocessing_ml as preml

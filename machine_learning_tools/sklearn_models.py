@@ -18,7 +18,13 @@ import pandas_ml as pdml
 def clf_name(clf):
     return str(clf).split("(")[0]
 
-
+from sklearn.utils import class_weight
+import numpy as np
+def compute_class_weight(y):
+    class_weights = class_weight.compute_class_weight('balanced',
+                                                 classes=np.unique(y),
+                                                 y=y)
+    return class_weights
 # ------- Linear Regression ------------
 """
 Notes: 
