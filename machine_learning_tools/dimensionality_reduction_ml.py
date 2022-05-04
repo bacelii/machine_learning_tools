@@ -454,6 +454,75 @@ def second_largest_eigenvector_proj(data,
                          **kwargs)
 
 # ========== intro to machine learning dimension reduction techniques =========
+from sklearn import decomposition,manifold
+import umap
+
+dimensionality_reduction_methods = {
+    "isomap":manifold.Isomap,
+    "laplacian_eigenmaps":manifold.SpectralEmbedding,
+    "spectral_embedding":manifold.SpectralEmbedding,
+    "tsne":manifold.TSNE,
+    "pca":decomposition.PCA,
+    "mds":decomposition.MDS,
+    "umap":umap.UMAP
+    
+    
+}
+
+import visualizations_ml as vml
+def dimensionality_reduction_by_method(
+    X
+    method="umap",
+    n_components=3,
+    plot=True,
+    plot_kwargs=None,
+    y = None,
+    verbose = False,
+    **kwargs):
+    
+    """
+    Purpose: To apply a dimensionality reduction technique
+    to a dataset (and optionally plot)
+    
+    Ex: 
+    method="tsne",
+    X=X_pca[y!= "Unsure"],
+    n_components =2,
+    y = y[y != "Unsure"],
+    
+    plot=True,
+    plot_kwargs=dict(
+    target_to_color = ctu.cell_type_fine_color_map,
+        ndim = 3,
+    )
+    """
+    
+    if plot_kwargs is None:
+        plot_kwargs = dict()
+        
+    method_func = dimensionality_reduction_methods.get(method,None)
+    
+    if method_func is None:
+        raise Exception("")
+        
+        
+    model = model_func(n_components=n_components,**kwargs)
+    X_trans = model.fit_transform(X)
+    
+    if verbose:
+        print(f"X_trans.shape = {X_trans.shape}")
+        
+    if plot:
+        vml.plot_df_scatter_classification(
+            X = X_trans,
+            y=y,
+            title=method
+            **plot_kwargs)
+        
+    return X_trans
+        
+    
+    
 
     
 import dimensionality_reduction_ml as dru

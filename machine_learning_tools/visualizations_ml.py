@@ -267,7 +267,8 @@ def plot_df_scatter_3d_classification(
     verbose = False,
     X=None,
     y = None,
-    ):
+    title = None,
+    ): 
     """
     Purpose: To plot features in 3D
     
@@ -286,6 +287,8 @@ def plot_df_scatter_3d_classification(
     if target_name is None:
         target_name = "target"
     if df is None:
+        if y is None:
+            y = ["None"]*len(X)
         df = pdml.df_from_X_y(X,y,target_name = target_name)
     
     
@@ -308,7 +311,8 @@ def plot_df_scatter_3d_classification(
 #             print(f"feature_names = {feature_names}")
             
 
-        X_curr,Y_curr,Z_curr = [X[k].to_numpy() for k in feature_names]
+        X_curr,Y_curr,Z_curr = [X[k].to_numpy() for i,k in enumerate(feature_names)
+                               if i < 3]
         
         ax.scatter(X_curr,Y_curr,Z_curr,
                    label=curr_label,
@@ -320,11 +324,280 @@ def plot_df_scatter_3d_classification(
         lfunc(f"{ax_title} {axis_append}")
     
     
-    ax.set_title(" vs. ".join(np.flip(feature_names)))
+    if title is None:
+        ax.set_title(" vs. ".join(np.flip(feature_names)))
+    else:
+        ax.set_title(title)
     mu.set_legend_outside_plot(ax)
     ax.legend()
     
     return ax
+
+def plot_df_scatter_2d_classification(
+    df=None,
+    target_name = None,
+    feature_names = None,
+    
+    #plotting features
+    figure_width = 10,
+    figure_height = 10,
+    alpha = 0.5,
+    axis_append = "",
+    
+    verbose = False,
+    X=None,
+    y = None,
+    title=None,
+    
+    ):
+    """
+    Purpose: To plot features in 3D
+    
+    Ex: 
+    %matplotlib notebook
+    sys.path.append("/machine_learning_tools/machine_learning_tools/")
+    import visualizations_ml as vml
+    vml.plot_df_scatter_3d_classification(df,target_name="group_label",
+                                         feature_names= [
+        #"ipr_eig_xz_to_width_50",
+        "center_to_width_50",
+        "n_limbs",
+        "ipr_eig_xz_max_95"
+    ])
+    
+    
+    Ex: 
+    ax = vml.plot_df_scatter_2d_classification(
+        X=X_trans[y!= "Unknown"],
+        y = y[y != "Unknown"],
+    )
+
+    import matplotlib_utils as mu
+    mu.set_legend_outside_plot(ax)
+    
+    """
+    if target_name is None:
+        target_name = "target"
+    if df is None:
+        df = pdml.df_from_X_y(X,y,target_name = target_name)
+    
+    
+    fig,ax= plt.subplots(1,1)
+    fig.set_size_inches(figure_width,figure_height)
+    
+    split_dfs = pdml.split_df_by_target(df,target_name = target_name)
+    for df_curr in split_dfs:
+        X,y = pdml.X_y(df_curr,target_name=target_name)
+        
+        curr_label = np.unique(y.to_numpy())[0]
+        if verbose:
+            print(f"Working on label: {curr_label}")
+    
+        if feature_names is None:
+            feature_names = pdml.feature_names(X)
+
+#         if verbose:
+#             print(f"feature_names = {feature_names}")
+            
+
+        X_curr,Y_curr = [X[k].to_numpy() for i,k in enumerate(feature_names)
+                        if i < 2]
+        
+        ax.scatter(X_curr,Y_curr,
+                   label=curr_label,
+                   alpha = alpha)
+        
+    
+    label_function = [ax.set_xlabel,ax.set_ylabel]
+    for lfunc,ax_title in zip(label_function,feature_names):
+        lfunc(f"{ax_title} {axis_append}")
+    
+    if title is None:
+        ax.set_title(" vs. ".join(np.flip(feature_names)))
+    else:
+        ax.set_title(title)
+    mu.set_legend_outside_plot(ax)
+    ax.legend()
+    
+    return ax
+
+def plot_df_scatter_classification_old(
+    df=None,
+    target_name = None,
+    feature_names = None,
+    
+    #plotting features
+    figure_width = 10,
+    figure_height = 10,
+    alpha = 0.5,
+    axis_append = "",
+    
+    verbose = False,
+    X=None,
+    y = None,
+    title = None,
+    **kwargs
+    ):
+    """
+    Ex: 
+    
+    ax = vml.plot_df_scatter_classification(
+    X=X_trans[y!= "Unknown"][:,:2],
+    y = y[y != "Unknown"],
+    )
+
+    import matplotlib_utils as mu
+    ax = mu.set_legend_outside_plot(ax)
+    """
+    
+    if target_name is None:
+        target_name = "target"
+    if df is None:
+        if y is None:
+            y = ["None"]*len(X)
+        df = pdml.df_from_X_y(X,y,target_name = target_name)
+    
+    if len(df.columns) <= 3:
+        plot_func = plot_df_scatter_2d_classification
+    else:
+        plot_func = plot_df_scatter_3d_classification
+        
+    if verbose:
+        print(f"Using plotting function {plot_func}")
+    return plot_func(
+        df=df,
+        target_name = target_name,
+        feature_names = feature_names,
+
+        #plotting features
+        figure_width = figure_width,
+        figure_height = figure_height,
+        alpha = alpha,
+        axis_append = axis_append,
+
+        verbose = verbose,
+        X=X,
+        y = y,
+        title = title,
+        **kwargs
+    )
+    
+import matplotlib_utils as mu
+def plot_df_scatter_classification(
+    df=None,
+    target_name = None,
+    feature_names = None,
+    ndim = 3,
+    
+    #plotting features
+    figure_width = 14,
+    figure_height = 14,
+    alpha = 0.5,
+    axis_append = "",
+    
+    verbose = False,
+    X=None,
+    y = None,
+    title=None,
+    target_to_color = None,
+    default_color = "yellow",
+    
+    #for the legend:
+    scale_down_legend = 0.75,
+    bbox_to_anchor=(1.02,0.5),
+    ):
+    """
+    Purpose: To plot features in 3D
+    
+    Ex: 
+    %matplotlib notebook
+    sys.path.append("/machine_learning_tools/machine_learning_tools/")
+    import visualizations_ml as vml
+    vml.plot_df_scatter_3d_classification(df,target_name="group_label",
+                                         feature_names= [
+        #"ipr_eig_xz_to_width_50",
+        "center_to_width_50",
+        "n_limbs",
+        "ipr_eig_xz_max_95"
+    ])
+    """
+    if target_name is None:
+        target_name = "target"
+    if df is None:
+        if y is None:
+            y = ["None"]*len(X)
+        df = pdml.df_from_X_y(X,y,target_name = target_name)
+        
+    if len(df.columns) <= 3:
+        ndim = 2
+    
+    if ndim == 3:
+        fig = plt.figure()
+        fig.set_size_inches(figure_width,figure_height)
+        ax = fig.add_subplot(111, projection = "3d")
+    elif ndim == 2:
+        fig,ax= plt.subplots(1,1)
+        fig.set_size_inches(figure_width,figure_height)
+    else:
+        raise Exception("")
+    
+    split_dfs = pdml.split_df_by_target(df,target_name = target_name)
+    for df_curr in split_dfs:
+        X,y = pdml.X_y(df_curr,target_name=target_name)
+        
+        curr_label = np.unique(y.to_numpy())[0]
+        if verbose:
+            print(f"Working on label: {curr_label}")
+    
+        if feature_names is None:
+            feature_names = pdml.feature_names(X)
+            
+        if target_to_color is not None:
+            c = target_to_color.get(curr_label,default_color) 
+            #c = mu.color_to_rgb(c)
+        else:
+            c = None
+
+#         if verbose:
+#             print(f"feature_names = {feature_names}")
+            
+
+        curr_data = [X[k].to_numpy() for i,k in enumerate(feature_names)
+                               if i < ndim] 
+        
+        ax.scatter(*curr_data,
+                   label=curr_label,
+                   c = c,
+                   alpha = alpha
+        )
+        
+    if ndim == 3:
+        label_function = [ax.set_xlabel,ax.set_ylabel,ax.set_zlabel]
+    else:
+        label_function = [ax.set_xlabel,ax.set_ylabel]
+    for lfunc,ax_title in zip(label_function,feature_names):
+        lfunc(f"{ax_title} {axis_append}")
+    
+    
+    if title is None:
+        ax.set_title(" vs. ".join(np.flip(feature_names)))
+    else:
+        ax.set_title(title)
+    
+    ax.legend()
+    mu.set_legend_outside_plot(
+        ax,
+        #scale_down=scale_down_legend,
+        bbox_to_anchor = bbox_to_anchor,
+        #loc = "center left"
+    )
+    
+    
+    
+    return ax
+    
+
+
     
     
 #Plotting function
