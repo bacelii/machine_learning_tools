@@ -463,7 +463,7 @@ dimensionality_reduction_methods = {
     "spectral_embedding":manifold.SpectralEmbedding,
     "tsne":manifold.TSNE,
     "pca":decomposition.PCA,
-    "mds":decomposition.MDS,
+    "mds":manifold.MDS,
     "umap":umap.UMAP
     
     
@@ -471,10 +471,10 @@ dimensionality_reduction_methods = {
 
 import visualizations_ml as vml
 def dimensionality_reduction_by_method(
-    X
+    X,
     method="umap",
     n_components=3,
-    plot=True,
+    plot=False,
     plot_kwargs=None,
     y = None,
     verbose = False,
@@ -506,7 +506,7 @@ def dimensionality_reduction_by_method(
         raise Exception("")
         
         
-    model = model_func(n_components=n_components,**kwargs)
+    model = method_func(n_components=n_components,**kwargs)
     X_trans = model.fit_transform(X)
     
     if verbose:
@@ -516,7 +516,7 @@ def dimensionality_reduction_by_method(
         vml.plot_df_scatter_classification(
             X = X_trans,
             y=y,
-            title=method
+            title=method,
             **plot_kwargs)
         
     return X_trans

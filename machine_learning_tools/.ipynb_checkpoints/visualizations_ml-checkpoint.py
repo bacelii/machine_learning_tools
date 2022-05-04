@@ -711,5 +711,48 @@ def plot_decision_tree(clf,
     display(SVG(graph.pipe(format='svg')))
     
     
+import numpy_utils as nu
+import visualizations_ml as vml
+import dimensionality_reduction_ml as dru
+def plot_dim_red_analysis(
+    X,
+    method,
+    y = None,
+    n_components = [2,3],
+    alpha = 0.5,
+    color_mapppings = None,
+    plot_kwargs = None,#dict(),
+    verbose=False,
+    **kwargs
+    ):
+    
+    if plot_kwargs is None:
+        plot_kwargs = dict()
+    
+    n_components = nu.convert_to_array_like(n_components)
+    color_mapppings = nu.convert_to_array_like(color_mapppings)
+    
+    for ndim in n_components:
+        X_trans = dru.dimensionality_reduction_by_method(
+        method=method,
+        X = X,
+        n_components =ndim,
+        **kwargs
+        )
+        
+        for cm in color_mapppings:
+            vml.plot_df_scatter_classification(
+                X = X_trans,
+                y = y,
+                target_to_color = cm,
+                ndim = ndim,
+                alpha = alpha,
+                title=method,
+                **plot_kwargs
+                
+            )
+            plt.show()
+    
+    
     
 import visualizations_ml as vml
