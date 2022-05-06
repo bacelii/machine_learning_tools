@@ -500,7 +500,7 @@ def dimensionality_reduction_by_method(
     if plot_kwargs is None:
         plot_kwargs = dict()
         
-    method_func = dimensionality_reduction_methods.get(method,None)
+    method_func = dimensionality_reduction_methods.get(method.lower(),None)
     
     if method_func is None:
         raise Exception("")

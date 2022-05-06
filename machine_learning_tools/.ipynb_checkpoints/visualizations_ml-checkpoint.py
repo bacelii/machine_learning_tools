@@ -505,6 +505,21 @@ def plot_df_scatter_classification(
     #for the legend:
     scale_down_legend = 0.75,
     bbox_to_anchor=(1.02,0.5),
+
+    
+    #--- text to plot ----
+    
+    #--  a dictionary mapping the name o a coordinate to plot at
+    text_to_plot_dict=None,
+    
+    # --- whether to compute the dictionary of text to plot from labels
+    use_labels_as_text_to_plot = False,
+    
+    #labels to plot for each of he datapoints
+    text_to_plot_individual = None,
+    
+    #for text parameters:
+    **kwargs
     ):
     """
     Purpose: To plot features in 3D
@@ -540,6 +555,8 @@ def plot_df_scatter_classification(
         fig.set_size_inches(figure_width,figure_height)
     else:
         raise Exception("")
+        
+    
     
     split_dfs = pdml.split_df_by_target(df,target_name = target_name)
     for df_curr in split_dfs:
@@ -577,6 +594,21 @@ def plot_df_scatter_classification(
         label_function = [ax.set_xlabel,ax.set_ylabel]
     for lfunc,ax_title in zip(label_function,feature_names):
         lfunc(f"{ax_title} {axis_append}")
+        
+        
+    # Doing the plotting of the labels
+    
+    
+    if text_to_plot_dict is not None or use_labels_as_text_to_plot: 
+        X,y = pdml.X_y(df,target_name=target_name)
+        mu.text_overlay(
+            ax,
+            text_to_plot_dict=text_to_plot_dict,
+            X=X,
+            y = y,
+            **kwargs
+        )
+
     
     
     if title is None:
