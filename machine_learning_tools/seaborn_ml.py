@@ -85,6 +85,16 @@ def heatmap(array,
         ax.set_title(title)
     
     return ax
+
+import matplotlib.pyplot as plt
+def save_plot_as_png(
+    sns_plot,
+    filename = "seaborn_plot.png"
+    ):
+    
+    
+    fig = sns_plot.fig
+    fig.savefig(filename) 
     
     
     
