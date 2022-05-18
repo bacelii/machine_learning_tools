@@ -56,7 +56,7 @@ def pairplot(df,**kwargs):
     return sns.pairplot(df,**kwargs)
 
 def hist2D(x_df,y_df,n_bins = 100,cbar=True,**kwargs):
-    sns.histplot(x=x_df,#.iloc[:1000], 
+    return sns.histplot(x=x_df,#.iloc[:1000], 
            y=y_df,#.iloc[:1000],
             bins=n_bins,
              cbar=True,
@@ -97,6 +97,41 @@ def save_plot_as_png(
     fig.savefig(filename) 
     
     
-    
+import numpy_utils as nu
+import pandas_utils as pu
+def pairwise_hist2D(
+    df,
+    reject_outliers = True,
+    verbose = True):
+    df_pair_plot = df
+    columns = list(df_pair_plot.columns)
+    for i,c1 in enumerate(df_pair_plot.columns):
+        for j,c2 in enumerate(df_pair_plot.columns):
+            if j > i:
+                if verbose:
+                    print(f"\n\n\n--- working on {c1} vs {c2}-----")
+                df_pair_plot_no_nan = pu.filter_away_nan_rows(df_pair_plot[[c1,c2]])
+                if verbose:
+                    print(f"# of after nans filtered = {len(df_pair_plot_no_nan)}")
+                x = df_pair_plot_no_nan[c1].to_numpy()
+                y = df_pair_plot_no_nan[c2].to_numpy()
+                if reject_outliers:
+                    x_mask = nu.reject_outliers(x,return_mask = True)
+                    y_mask = nu.reject_outliers(y,return_mask = True)
+                    mask = np.logical_and(x_mask,y_mask)
+                    if verbose:
+                        print(f"# of datapoints after outlier = {np.sum(mask)}")
+                    x = x[mask]
+                    y = y[mask]
+
+    #             fig,ax = plt.subplots(1,1)
+    #             ax.scatter(x[mask],y[mask])
+                ax = sml.hist2D(x,y)
+                ax.set_xlabel(c1)
+                ax.set_ylabel(c2)
+                ax.set_title(f"{c2} vs {c1}")
+                plt.show()
+                #break
+        #break
 
 import seaborn_ml as sml
