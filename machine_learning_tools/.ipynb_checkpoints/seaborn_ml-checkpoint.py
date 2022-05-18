@@ -99,22 +99,37 @@ def save_plot_as_png(
     
 import numpy_utils as nu
 import pandas_utils as pu
+import statistics_utils as stu
 def pairwise_hist2D(
     df,
     reject_outliers = True,
-    verbose = True):
+    percentile_upper = 99.5,
+    percentile_lower = None,
+    features = None,
+    verbose = True,
+    return_data = False,
+    bins = "auto"):
     df_pair_plot = df
-    columns = list(df_pair_plot.columns)
-    for i,c1 in enumerate(df_pair_plot.columns):
-        for j,c2 in enumerate(df_pair_plot.columns):
+    
+    if features is None:
+        columns = list(df_pair_plot.columns)
+    else:
+        columns = features
+        
+    if return_data:
+        data = dict()
+    for i,c1 in enumerate(columns):
+        #print(f"i = {i}")
+        for j,c2 in enumerate(columns):
+            #print(f"j = {j}")
             if j > i:
                 if verbose:
                     print(f"\n\n\n--- working on {c1} vs {c2}-----")
                 df_pair_plot_no_nan = pu.filter_away_nan_rows(df_pair_plot[[c1,c2]])
                 if verbose:
                     print(f"# of after nans filtered = {len(df_pair_plot_no_nan)}")
-                x = df_pair_plot_no_nan[c1].to_numpy()
-                y = df_pair_plot_no_nan[c2].to_numpy()
+                x = df_pair_plot_no_nan[c1].to_numpy().astype("float")
+                y = df_pair_plot_no_nan[c2].to_numpy().astype("float")
                 if reject_outliers:
                     x_mask = nu.reject_outliers(x,return_mask = True)
                     y_mask = nu.reject_outliers(y,return_mask = True)
@@ -123,15 +138,48 @@ def pairwise_hist2D(
                         print(f"# of datapoints after outlier = {np.sum(mask)}")
                     x = x[mask]
                     y = y[mask]
+                    
+                if percentile_upper is not None:
+                    x_mask = x <= np.percentile(x,percentile_upper)
+                    y_mask = y <= np.percentile(y,percentile_upper)
+                    mask = np.logical_and(x_mask,y_mask)
+                    
+                    if verbose:
+                        print(f"# of datapoints after percentile_upper"
+                              f" ({percentile_upper}) = {np.sum(mask)}")
+                    x = x[mask]
+                    y = y[mask]
+                    
+                if percentile_lower is not None:
+                    x_mask = x >= np.percentile(x,percentile_lower)
+                    y_mask = y >= np.percentile(y,percentile_lower)
+                    mask = np.logical_and(x_mask,y_mask)
+                    
+                    if verbose:
+                        print(f"# of datapoints after percentile_upper"
+                              f" ({percentile_upper}) = {np.sum(mask)}")
+                    x = x[mask]
+                    y = y[mask]
+                    
 
     #             fig,ax = plt.subplots(1,1)
     #             ax.scatter(x[mask],y[mask])
-                ax = sml.hist2D(x,y)
+                
+                if verbose:
+                    print(f"corr = {stu.corr(x,y)}, corr_spearman = {stu.corr_spearman(x,y)}")
+        
+                if return_data:
+                    if c1 not in data:
+                        data[c1] = dict()
+                    data[c1][c2] = dict(x=x,y=y)
+                ax = sml.hist2D(x,y,n_bins=bins)
                 ax.set_xlabel(c1)
                 ax.set_ylabel(c2)
                 ax.set_title(f"{c2} vs {c1}")
                 plt.show()
                 #break
         #break
+    if return_data:
+        return data
 
 import seaborn_ml as sml
