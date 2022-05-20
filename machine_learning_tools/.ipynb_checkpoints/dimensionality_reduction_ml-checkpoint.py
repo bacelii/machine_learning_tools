@@ -470,6 +470,7 @@ dimensionality_reduction_methods = {
 }
 
 import visualizations_ml as vml
+import time
 def dimensionality_reduction_by_method(
     X,
     method="umap",
@@ -496,6 +497,8 @@ def dimensionality_reduction_by_method(
         ndim = 3,
     )
     """
+    import time
+    st = time.time()
     
     if plot_kwargs is None:
         plot_kwargs = dict()
@@ -511,6 +514,9 @@ def dimensionality_reduction_by_method(
     
     if verbose:
         print(f"X_trans.shape = {X_trans.shape}")
+        print(f"Total time = {time.time() - st}")
+        
+    st = time.time()
         
     if plot:
         vml.plot_df_scatter_classification(
@@ -518,6 +524,9 @@ def dimensionality_reduction_by_method(
             y=y,
             title=method,
             **plot_kwargs)
+        print(f"Time for plotting = {time.time() - st}")
+        
+    
         
     return X_trans
         

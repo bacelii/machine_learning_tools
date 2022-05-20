@@ -483,6 +483,7 @@ def plot_df_scatter_classification_old(
     )
     
 import matplotlib_utils as mu
+import pandas_utils as pu
 def plot_df_scatter_classification(
     df=None,
     target_name = None,
@@ -505,6 +506,8 @@ def plot_df_scatter_classification(
     #for the legend:
     scale_down_legend = 0.75,
     bbox_to_anchor=(1.02,0.5),
+    
+    ax = None,
 
     
     #--- text to plot ----
@@ -517,6 +520,8 @@ def plot_df_scatter_classification(
     
     #labels to plot for each of he datapoints
     text_to_plot_individual = None,
+    
+    replace_None_with_str_None = False,
     
     #for text parameters:
     **kwargs
@@ -546,17 +551,19 @@ def plot_df_scatter_classification(
     if len(df.columns) <= 3:
         ndim = 2
     
-    if ndim == 3:
-        fig = plt.figure()
-        fig.set_size_inches(figure_width,figure_height)
-        ax = fig.add_subplot(111, projection = "3d")
-    elif ndim == 2:
-        fig,ax= plt.subplots(1,1)
-        fig.set_size_inches(figure_width,figure_height)
-    else:
-        raise Exception("")
+    if ax is None:
+        if ndim == 3:
+            fig = plt.figure()
+            fig.set_size_inches(figure_width,figure_height)
+            ax = fig.add_subplot(111, projection = "3d")
+        elif ndim == 2:
+            fig,ax= plt.subplots(1,1)
+            fig.set_size_inches(figure_width,figure_height)
+        else:
+            raise Exception("")
         
-    
+    if replace_None_with_str_None:
+        df = pu.replace_None_with_default(df,"None")
     
     split_dfs = pdml.split_df_by_target(df,target_name = target_name)
     for df_curr in split_dfs:
