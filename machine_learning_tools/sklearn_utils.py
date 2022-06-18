@@ -537,4 +537,8 @@ def CV_optimal_param_1D(
     else:
         return clf
 
+
+def accuracy_score(y_true,y_pred,**kwargs):
+    return sklearn.metrics.accuracy_score(y_true,y_pred,**kwargs)
+
 import sklearn_utils as sklu

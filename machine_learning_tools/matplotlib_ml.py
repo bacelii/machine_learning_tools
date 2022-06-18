@@ -697,6 +697,6 @@ def scatter_2D_with_labels(
 
     plt.show()
     
-
+  
     
 import matplotlib_ml as mu
