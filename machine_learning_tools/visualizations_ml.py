@@ -421,7 +421,7 @@ def plot_df_scatter_2d_classification(
     
     return ax
 
-def plot_df_scatter_classification_old(
+'''def plot_df_scatter_classification_old(
     df=None,
     target_name = None,
     feature_names = None,
@@ -480,7 +480,7 @@ def plot_df_scatter_classification_old(
         y = y,
         title = title,
         **kwargs
-    )
+    )'''
     
 import matplotlib_utils as mu
 import pandas_utils as pu
