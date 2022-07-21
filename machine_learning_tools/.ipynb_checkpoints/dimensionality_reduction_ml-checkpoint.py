@@ -469,6 +469,15 @@ dimensionality_reduction_methods = {
     
 }
 
+def dimensionality_reduction_by_umap(
+    x,
+    random_state=42,
+    n_neighbors=15, #as smaller gets ore packed
+    min_dist = 0.1, #as go smaller gets more packed
+    ):
+    
+    pass
+
 import visualizations_ml as vml
 import time
 def dimensionality_reduction_by_method(
