@@ -32,10 +32,25 @@ def hist(array,
     fig,ax = plt.subplots(figsize=figsize)
     return sns.distplot(array,bins = bins,ax = ax,**kwargs)
 
+def lineplot(
+    df,
+    x,
+    y,
+    hue=None,
+    **kwargs):
+    
+    return sns.lineplot(
+        data=df,
+        x=x,
+        y=y,
+        hue=hue,
+        **kwargs)
+
 def scatter_2D(x,y,
                x_label="feature_1",
                y_label = "feature_2",
                title = None,
+               
                alpha=0.5,**kwargs):
     data = pd.DataFrame({
     x_label: x,
