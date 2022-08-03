@@ -80,24 +80,57 @@ def hist2D(x_df,y_df,n_bins = 100,cbar=True,**kwargs):
     
 
 from matplotlib.colors import LogNorm
-def heatmap(array,
-            cmap = sns.cm.rocket_r,
+
+"""
+Arguments to set for heatmap:
+
+cmap='Blues',
+annot=True,
+fmt=".0f",
+annot_kws={
+    'fontsize': 16,
+    'fontweight': 'bold',
+    'fontfamily': 'serif'
+}
+"""
+import matplotlib_utils as mu
+def heatmap(df,
+            cmap ="Blues",# sns.cm.rocket_r,
+            annot=True,
             logscale = True,
             title=None,
+            figsize=None,
+            fontsize=16,
+            axes_fontsize = 30,
              ax = None,
+            fmt = None,
             **kwargs):
     """
     Purpose: Will make a heatmap
     """
     if ax is None:
-        fig,ax = plt.subplots(1,1)
+        fig,ax = plt.subplots(1,1,figsize=figsize)
     if logscale:
-        sns.heatmap(array, square=True, norm=LogNorm(),ax=ax,cmap=cmap)
-    else:
-        sns.heatmap(array, square=True,ax=ax,cmap=cmap)
+        kwargs["norm"] = LogNorm()
+    if fmt is not None:
+        kwargs["fmt"] = fmt
+    sns.heatmap(
+        df,
+        square=True,
+        ax=ax,
+        cmap=cmap,
+        annot=annot,
+        annot_kws={
+            'fontsize': fontsize,
+            'fontweight': 'bold',
+            'fontfamily': 'serif'
+        },
+        **kwargs)
     
     if title is not None:
         ax.set_title(title)
+        
+    ax = mu.set_axes_font_size(ax,axes_fontsize)
     
     return ax
 
