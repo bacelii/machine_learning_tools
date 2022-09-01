@@ -36,6 +36,17 @@ from sklearn import linear_model
 def LinearRegression(**kwargs):
     return linear_model.LinearRegression(**kwargs)
 
+def residuals(model,x,y,return_score = True,):
+    model.fit(x,y)
+    y_pred = model.predict(x)
+    residuals = y_pred - y
+    
+    if return_score:
+        score = model.score(x,y)
+        return residuals,score
+    else:
+        return residuals
+
 fit_intercept_default = False
 alpha_default = 1
 l1_ratio_default = 0.5
