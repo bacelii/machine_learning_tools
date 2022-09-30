@@ -540,6 +540,35 @@ def dimensionality_reduction_by_method(
     return X_trans
         
     
+import pandas as pd
+def add_dimensionality_reduction_embeddings_to_df(
+    df,
+    method = "UMAP",
+    feature_columns = None,
+    return_transform_columns = False,
+    **kwargs
+    ):
+    
+    if feature_columns is None:
+        feature_columns = [k for k in df.columns if "int" in str(type(k))]#stru.is_int(k)]
+    
+
+    # gets the actual embeddings
+    X_trans = dru.dimensionality_reduction_by_method(
+        method = method,
+        X = df[feature_columns].to_numpy().astype('float'),
+        **kwargs
+    )
+
+    trans_cols = [f"{method}_{k}" for k in range(X_trans.shape[1])]
+    # adding on the embeddings to the dataframe
+    df = pd.concat([df,pd.DataFrame(X_trans,columns = trans_cols)],axis = 1)
+    
+    if return_transform_columns:
+        return df,trans_cols
+    else:
+        return df
+    
     
 
     

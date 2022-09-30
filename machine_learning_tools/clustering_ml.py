@@ -394,7 +394,7 @@ def closest_k_nodes_on_dendrogram(
 
 from sklearn.cluster import AgglomerativeClustering, FeatureAgglomeration
 import clustering_ml as clu
-def closet_k_neighbors_from_nierarchical_clustering(
+def closet_k_neighbors_from_hierarchical_clustering(
     X,
     node_name,
     row_names,
@@ -408,7 +408,8 @@ def closet_k_neighbors_from_nierarchical_clustering(
     model = AgglomerativeClustering(
         distance_threshold=0, 
         n_clusters=None,
-        linkage="ward")
+        linkage="ward"
+    )
 
     model = model.fit(X)
     
