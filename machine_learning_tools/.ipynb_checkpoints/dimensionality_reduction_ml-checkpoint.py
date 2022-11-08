@@ -546,6 +546,7 @@ def add_dimensionality_reduction_embeddings_to_df(
     method = "UMAP",
     feature_columns = None,
     return_transform_columns = False,
+    n_components=3,
     **kwargs
     ):
     
@@ -557,6 +558,7 @@ def add_dimensionality_reduction_embeddings_to_df(
     X_trans = dru.dimensionality_reduction_by_method(
         method = method,
         X = df[feature_columns].to_numpy().astype('float'),
+        n_components=n_components,
         **kwargs
     )
 

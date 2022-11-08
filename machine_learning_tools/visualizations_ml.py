@@ -504,6 +504,7 @@ def plot_df_scatter_classification(
     default_color = "yellow",
     
     #for the legend:
+    plot_legend = True,
     scale_down_legend = 0.75,
     bbox_to_anchor=(1.02,0.5),
     
@@ -623,13 +624,14 @@ def plot_df_scatter_classification(
     else:
         ax.set_title(title)
     
-    ax.legend()
-    mu.set_legend_outside_plot(
-        ax,
-        #scale_down=scale_down_legend,
-        bbox_to_anchor = bbox_to_anchor,
-        #loc = "center left"
-    )
+    if plot_legend:
+        ax.legend()
+        mu.set_legend_outside_plot(
+            ax,
+            #scale_down=scale_down_legend,
+            bbox_to_anchor = bbox_to_anchor,
+            #loc = "center left"
+        )
     
     
     
@@ -793,5 +795,115 @@ def plot_dim_red_analysis(
             plt.show()
     
     
+def plot_binary_classifier_map(
+    clf,
+    X = None,
+    xmin=None,
+    xmax=None,
+    ymin=None,
+    ymax=None,
+    buffer = 0.01,
+    class_idx_to_plot = 0,
+    #plotting
+    figure_width = 10,
+    figure_height = 10,
+    axes_fontsize = 25,
+
+    class_0_color = mu.colorblind_blue,
+    class_1_color = mu.colorblind_orange,
+    mid_color = "white",
+    alpha = 0.5,
+    colorbar_label = None,
+    colorbar_labelpad = 30,
+    colorbar_label_fontsize = 20,
+    
+    
+    ax = None,
+    ):
+    """
+
+    Purpose: To plot the prediction
+    map of a binary classifier
+
+    Arguments: 
+    1) Model
+    2) Define the input space want to test over
+    (xmin,xmax)
+
+    Pseudocode: 
+    1) Create a meshgrid of the input space
+    2) Send the prediction
+
+
+    ======Example:=======
+    import visualizations_ml as vml
+
+    figure_width = 10
+    figure_height = 10
+    fig,ax = plt.subplots(1,1,figsize=(figure_width,figure_height))
+
+    X = df_plot[trans_cols].to_numpy().astype("float")
+
+    vml.plot_binary_classifier_map(
+        clf = ctu.e_i_model,
+        X = X,
+        xmin = 0,
+        xmax = 4.5,
+        ymin=-0.1,
+        ymax = 1.2,
+        alpha = 0.5,
+        colorbar_label = "Excitatory Probability",
+        ax = ax,
+    )
+    """
+    
+    if xmin is None:
+        xmin = X[:, 0].min() - buffer
+
+    if xmax is None:
+        xmax = X[:, 0].max() + buffer
+
+    if ymin is None:
+        ymin = X[:, 1].min() - buffer
+
+    if ymax is None:
+        ymax = X[:, 1].max() + buffer
+
+
+    XX,YY = nu.grid_array(xmin,xmax,ymin,ymax)
+    X = np.vstack([XX.ravel(),YY.ravel()]).T
+    Z = clf.predict_proba(X)[:,class_idx_to_plot]
+
+    if ax is None:
+        fig,ax = plt.subplots(1,1,figsize=(figure_width,figure_height))
+
+    colors = np.array([class_0_color,class_1_color])[[1-class_idx_to_plot,class_idx_to_plot]]
+    cmap = mu.cmap_from_color_a_to_b(
+        colors[0],
+        colors[1],
+        mid_color,
+    )
+
+    #clev = np.arange(-0.5,0.5,.0001)
+    if colorbar_label is None:
+        colorbar_label = f"Class {class_idx_to_plot} Probability"
+        
+    mu.plot_contour(
+        XX,YY,Z,
+        cmap = cmap,
+        ax = ax,
+        alpha = alpha,
+
+        # colorbar
+        plot_colorbar = True,
+        colorbar_label = colorbar_label,
+        colorbar_labelpad = colorbar_labelpad,
+        colorbar_label_fontsize = colorbar_label_fontsize,
+    )
+    
+    return ax
+
+import evaluation_metrics_utils as emu
+plot_confusion_matrix = emu.plot_confusion_matrix
     
 import visualizations_ml as vml
