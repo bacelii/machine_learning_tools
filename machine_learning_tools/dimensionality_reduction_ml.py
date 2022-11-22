@@ -506,6 +506,12 @@ def dimensionality_reduction_by_method(
         ndim = 3,
     )
     """
+    
+    if "seed" in kwargs and method.lower() == "umap":
+        kwargs["transform_seed"] = kwargs["seed"]
+        del kwargs["seed"]
+        
+    #print(f"kwargs = {kwargs}")
     import time
     st = time.time()
     

@@ -6,8 +6,12 @@ def confusion_matrix(
     y_pred,
     labels = None, #tells how to sort
     normalize = None, # could normalize across "true","pred",
-    return_df = False
+    return_df = False,
+    df = None
     ):
+    if df is not None:
+        y_true = df[y_true].to_list()
+        y_pred = df[y_pred].to_list()
     
     return_matrix = metrics.confusion_matrix(
         y_true,
@@ -55,6 +59,7 @@ def plot_confusion_matrix(
     ylabels = None,
     
     #colorbar 
+    plot_colorbar = True,
     colobar_tick_fontsize = 25,
     
     ax = None,
@@ -69,6 +74,7 @@ def plot_confusion_matrix(
         annot_kws={
             "fontsize":annot_fontsize,
         },
+        cbar = plot_colorbar,
         cmap = cmap,
         vmin=vmin, 
         vmax=vmax,
@@ -84,8 +90,9 @@ def plot_confusion_matrix(
     if xlabels is not None or ylabels is not None:
         mu.set_axes_ticklabels(ax,xlabels,ylabels)
         
-    cbar = ax.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=colobar_tick_fontsize)
+    if plot_colorbar:
+        cbar = ax.collections[0].colorbar
+        cbar.ax.tick_params(labelsize=colobar_tick_fontsize)
 
     return ax
     

@@ -548,6 +548,7 @@ def plot_df_scatter_classification(
         if y is None:
             y = ["None"]*len(X)
         df = pdml.df_from_X_y(X,y,target_name = target_name)
+    
         
     if len(df.columns) <= 3:
         ndim = 2
@@ -581,7 +582,7 @@ def plot_df_scatter_classification(
             c = target_to_color.get(curr_label,default_color) 
             #c = mu.color_to_rgb(c)
         else:
-            c = None
+            c = default_color
 
 #         if verbose:
 #             print(f"feature_names = {feature_names}")
@@ -813,12 +814,14 @@ def plot_binary_classifier_map(
     class_1_color = mu.colorblind_orange,
     mid_color = "white",
     alpha = 0.5,
+    plot_colorbar = True,
     colorbar_label = None,
     colorbar_labelpad = 30,
     colorbar_label_fontsize = 20,
-    
+    colorbar_tick_fontsize = 25,
     
     ax = None,
+    **kwargs
     ):
     """
 
@@ -870,7 +873,7 @@ def plot_binary_classifier_map(
         ymax = X[:, 1].max() + buffer
 
 
-    XX,YY = nu.grid_array(xmin,xmax,ymin,ymax)
+    XX,YY = nu.grid_array(xmin,xmax,ymin,ymax,n_intervales = 1000)
     X = np.vstack([XX.ravel(),YY.ravel()]).T
     Z = clf.predict_proba(X)[:,class_idx_to_plot]
 
@@ -888,18 +891,22 @@ def plot_binary_classifier_map(
     if colorbar_label is None:
         colorbar_label = f"Class {class_idx_to_plot} Probability"
         
-    mu.plot_contour(
+    mu.plot_heatmap(
         XX,YY,Z,
         cmap = cmap,
         ax = ax,
         alpha = alpha,
 
         # colorbar
-        plot_colorbar = True,
+        plot_colorbar = plot_colorbar,
         colorbar_label = colorbar_label,
         colorbar_labelpad = colorbar_labelpad,
         colorbar_label_fontsize = colorbar_label_fontsize,
+        colorbar_tick_fontsize=colorbar_tick_fontsize,
+        **kwargs
     )
+    
+    
     
     return ax
 
