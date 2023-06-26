@@ -1,5 +1,15 @@
-import numpy as np
+
+from functools import reduce
+from pathlib import Path
+from scipy import stats
+from scipy.spatial.distance import pdist
+from scipy.spatial.distance import pdist,squareform
+import datetime
+import itertools
 import networkx as nx
+import numpy as np
+import time 
+import trimesh
 """
 Notes on functionality: 
 np.concatenate: combines list of lists into one list like itertools does
@@ -66,7 +76,6 @@ def concatenate_lists(list_of_lists):
     except:
         return []
 
-import trimesh
 def is_array_like(current_data,include_tuple=False):
     types_to_check = [type(np.ndarray([])),type(np.array([])),list,trimesh.caching.TrackedArray]
     if include_tuple:
@@ -116,7 +125,6 @@ def array_after_exclusion(
     #print(f"mask = {mask}")
     return original_array[mask]
 
-from pathlib import Path
 def load_dict(file_path):
     if file_path == type(Path()):
         file_path = str(file_path.absolute())
@@ -124,8 +132,6 @@ def load_dict(file_path):
     my_dict = np.load(file_path,allow_pickle=True)
     return my_dict[my_dict.files[0]][()]
 
-
-from scipy.spatial.distance import pdist,squareform
 def get_coordinate_distance_matrix(coordinates):
     distance_matrix_condensed = pdist(coordinates,'euclidean')
     distance_matrix = squareform(distance_matrix_condensed)
@@ -186,8 +192,6 @@ ex_skeleton = example_skeleton.reshape(-1,3)
 
 #sk.convert_skeleton_to_graph(ex_skeleton)
 
-from scipy.spatial.distance import pdist
-import time 
 start_time = time.time()
 distance_matrix = pdist(ex_skeleton,'euclidean')
 print(f"Total time for pdist = {time.time() - start_time}")
@@ -237,7 +241,7 @@ def sort_multidim_array_by_rows(edge_array,order_row_items=False,):
     (with possibly sorting the individual elements along a row)
     
     Example: On how to get sorted edges
-    import numpy_utils as nu
+    from python_tools import numpy_utils as nu
     nu = reload(nu)
     nu.sort_multidim_array_by_rows(limb_concept_network.edges(),order_row_items=True)
     
@@ -282,7 +286,6 @@ def sort_rows_by_column(array,column_idx,largest_to_smallest=True):
     return array[order]
 
 
-from functools import reduce
 
 def function_over_multi_lists(arrays,set_function):
     return reduce(set_function,arrays)
@@ -461,7 +464,6 @@ def unique_non_self_pairings(array):
     array = array[array[:,0] != array[:,1]]
     return array
 
-import itertools
 
 def choose_k_combinations(array,k):
     return list(itertools.combinations(array,k))
@@ -503,14 +505,13 @@ def unique_pairings_between_2_arrays(array1,array2):
 def remove_indexes(arr1,arr2):
     return np.delete(arr1,arr2)
 
-from scipy import stats
 def mode_1d(array):
     return stats.mode(array)[0][0]
     
 def all_subarrays (l): 
     """
     Ex: 
-    import numpy_utils as nu
+    from python_tools import numpy_utils as nu
     nu.all_subarrays([[1,"a"],[2,"b"],[3,"c"]])
     
     Output:
@@ -542,7 +543,7 @@ def random_2D_subarray(array,n_samples,
     a 2D array
     
     Ex: 
-    import numpy_utils as nu
+    from python_tools import numpy_utils as nu
     import numpy as np
 
     y = np.array([[1,3],[3,2],[5,6]])
@@ -563,7 +564,7 @@ def array_split(array,n_splits):
     """Split an array into multiple sub-arrays
     
     Ex: 
-    import numpy_utils as nu
+    from python_tools import numpy_utils as nu
     nu.array_split(np.arange(0,10),3)
     """
     return np.array_split(array,n_splits)
@@ -629,7 +630,6 @@ def all_partitions(array,
 
     return all_partitions
 
-import datetime
 def float_to_datetime(fl):
     return datetime.datetime.fromtimestamp(fl)
 
@@ -664,7 +664,7 @@ def polyfit(x,y,degree):
 def weighted_average(array,weights):
     """
     Ex: 
-    import numpy_utils as nu
+    from python_tools import numpy_utils as nu
     nu.weighted_average(d_widths,d_sk_lengths)
     """
     return np.average(array,weights=weights)
@@ -808,7 +808,7 @@ def divide_data_into_classes(classes_array,data_array,unique_classes=None):
 def concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D(arrays):
     """
     Example: 
-    import numpy_utils as nu
+    from python_tools import numpy_utils as nu
     arrays = [np.array([1,2,3]), np.array([4,5,6])]
     nu.concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D(arrays)
     
@@ -974,7 +974,6 @@ def random_shuffled_indexes_for_array(array):
     return nu.randomly_shuffle_array(idx_to_process)
 
 
-import itertools
 def all_choose_1_combinations_form_dict_values(parameter_dict,
                                         verbose = False):
     """
@@ -996,4 +995,7 @@ def all_choose_1_combinations_form_dict_values(parameter_dict,
     return [{k:v for k,v in zip(param_keys,l)} for l in all_param_comb]
 
 
-import numpy_ml as nu
+
+
+
+from . import numpy_ml as nu

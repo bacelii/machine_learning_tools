@@ -1,4 +1,7 @@
-"""
+'''
+
+
+
 Purpose: to export some functionality of the 
 statsmodels library for things like
 
@@ -15,9 +18,14 @@ lm1.rsquared gives the r squared value
 
 Notes:
 
-"""
 
+
+
+'''
+import numpy as np
+import pandas as pd
 import statsmodels.api as sm
+
 
 def linear_regression(df,
                       target_name,
@@ -28,7 +36,7 @@ def linear_regression(df,
     print out the summary of the coefficients
     
     eX: 
-    import statsmodels_utils as smu
+    from machine_learning_tools import statsmodels_utils as smu
     smu.linear_regression(df_raw[[target_name,"LSTAT"]],
                      target_name = target_name,
                      add_intercept = True,
@@ -54,7 +62,6 @@ def pvalues(model):
     return model.pvalues
 
 
-import pandas as pd
 def coef_pvalues_df(model):
     coef = smu.coef(model)
     pvals = smu.pvalues(model)
@@ -63,7 +70,6 @@ def coef_pvalues_df(model):
     df.columns = ["coef","pvalues"]
     return df
 
-import numpy as np
 def ranked_features(model,
                     pval_max = 0.001,
                    verbose = False,
@@ -97,4 +103,7 @@ def ranked_features(model,
         return ordered_features
 
     
-import statsmodels_utils as smu
+
+
+
+from . import statsmodels_utils as smu

@@ -1,7 +1,9 @@
+
+from matplotlib.ticker import MaxNLocator
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn import decomposition
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn import decomposition
-from matplotlib.ticker import MaxNLocator
 
 
 
@@ -229,9 +231,6 @@ def pca_analysis(data,
 
 
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import numpy_ml as nu
 def plot_projected_data(data_proj,labels,axis_prefix="Proj",
                        text_to_plot_dict=None):
     """
@@ -270,7 +269,6 @@ def plot_projected_data(data_proj,labels,axis_prefix="Proj",
     plt.show()
     
 
-import matplotlib.pyplot as plt
 def plot_um(UM,height=8,width=4,title="Imshow of the UM matrix"):
     fig,ax = plt.subplots(1,1)
     fig.set_size_inches(width,height)
@@ -374,4 +372,9 @@ def second_largest_eigenvector_proj(data,
 # ========== intro to machine learning dimension reduction techniques =========
 
     
-import dimensionality_reduction_utils as dru
+
+
+#--- from machine_learning_tools ---
+from . import numpy_ml as nu
+
+from . import dimensionality_reduction_utils as dru

@@ -1,4 +1,7 @@
-"""
+'''
+
+
+
 Functions used on data before
 models analyze the data
 
@@ -10,7 +13,11 @@ so they get regularized the same amount
 Useful link explaining different sklearn scalars for preprocessing: 
 
 http://benalexkeen.com/feature-scaling-with-scikit-learn/
-"""
+
+
+
+'''
+import pandas as pd
 import sklearn.preprocessing as sklpre
 
 available_scalars = dict(
@@ -33,8 +40,6 @@ def get_scaler(scaler="normal_dist"):
     else:
         return available_scalars[scaler]()
     
-import pandas_ml as pdml
-import pandas as pd
 def scale_df(
     df,
     scaler="StandardScaler",
@@ -49,7 +54,7 @@ def scale_df(
     1) Get the appropriate scaler
     
     Ex: 
-    import preprocessing_ml as preml
+    from machine_learning_tools import preprocessing_ml as preml
     preml.scale_df(df,
     target_name=target_name,
     scaler = "RobustScaler",
@@ -95,4 +100,9 @@ new_dfs = [pd.get_dummies(df_filt[[k]],drop_first=False) for k in one_hot_column
 """
 
 
-import preprocessing_ml as preml
+
+
+#--- from machine_learning_tools ---
+from . import pandas_ml as pdml
+
+from . import preprocessing_ml as preml

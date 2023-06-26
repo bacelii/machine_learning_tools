@@ -1,8 +1,7 @@
-from matplotlib import colors
-import numpy as np
-import numpy_ml as nu
+'''
 
-"""
+
+
 Notes on other functions: 
 eventplot #will plot 1D data as lines, can stack multiple 1D events
 -- if did a lot of these gives the characteristic neuron spikes
@@ -24,7 +23,21 @@ fig.tight_layout()
 
 
 
-"""
+
+
+
+'''
+from IPython.display import display
+from copy import copy
+from matplotlib import colors
+from matplotlib import colors as mcolors
+from matplotlib.ticker import MaxNLocator
+import matplotlib
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import webcolors
+
 
 graph_color_list = ["blue","green","red","cyan","magenta",
      "black","grey","midnightblue","pink","crimson",
@@ -138,7 +151,6 @@ def color_to_rgba(current_color,alpha=0.2):
     curr_rgb = color_to_rgb(current_color)
     return apply_alpha_to_color_list(curr_rgb,alpha=alpha)
     
-from copy import copy
 def get_graph_color_list():
     return copy(graph_color_list)
 
@@ -148,7 +160,6 @@ def generate_random_rgba(print_flag=False):
         print(f"random color chosen = {rand_color}")
     return colors.to_rgb(rand_color[0])
 
-import numpy_ml as nu
 def generate_color_list_no_alpha_change(
                         user_colors=[], #if user sends a prescribed list
                         n_colors=-1,
@@ -240,8 +251,6 @@ def apply_alpha_to_color_list(color_list,alpha=0.2,print_flag=False):
 
 
 
-import webcolors
-import numpy as np
 
 def closest_colour(requested_colour):
     min_colours = {}
@@ -294,7 +303,7 @@ def convert_dict_rgb_values_to_names(color_dict):
     neuron plotting function
     
     Example: 
-    import matplotlib_utils as mu
+    from python_tools import matplotlib_utils as mu
     mu = reload(mu)
     nviz=reload(nviz)
 
@@ -318,8 +327,6 @@ def convert_dict_rgb_values_to_names(color_dict):
     return dict([(k,convert_rgb_to_name(v)) for k,v in color_dict.items()])
     
 
-import matplotlib.pyplot as plt
-from matplotlib import colors as mcolors
 
 base_colors_dict = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
@@ -340,7 +347,7 @@ def plot_color_dict(colors,sorted_names=None,
     mu.plot_color_dict(mu.base_colors_dict,hue_sort=True,figure_height=20)
     
     How to plot colors returned from the plotting function:
-    import matplotlib_utils as mu
+    from python_tools import matplotlib_utils as mu
     mu = reload(mu)
     nviz=reload(nviz)
 
@@ -432,7 +439,6 @@ def get_axes_layout_from_figure(fig):
     return np.max(np.array(get_axes_locations_from_figure(fig)),axis=0) + np.array([1,1])
 
 # plotting the BIC curve
-from matplotlib.ticker import MaxNLocator
 def plot_graph(title,
                 y_values,
                 x_values,
@@ -469,11 +475,9 @@ def plot_graph(title,
     else:
         plt.show()
 
-import matplotlib
 def color_to_hex(color):
     return matplotlib.colors.to_hex(color, keep_alpha=False)
         
-from IPython.display import display
 def display_figure(fig):
     display(fig)
     
@@ -549,9 +553,6 @@ def histogram(data,
     else:
         return ax
     
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import matplotlib
 def reset_default_settings():
     mpl.rcParams.update(mpl.rcParamsDefault)
     
@@ -699,4 +700,9 @@ def scatter_2D_with_labels(
     
   
     
-import matplotlib_ml as mu
+
+
+#--- from machine_learning_tools ---
+from . import numpy_ml as nu
+
+from . import matplotlib_ml as mu

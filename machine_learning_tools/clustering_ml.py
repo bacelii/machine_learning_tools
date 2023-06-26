@@ -1,5 +1,21 @@
-import numpy as np
+
+from collections import Counter
+from matplotlib import pyplot as plt
+from os import sys
+from scipy.cluster.hierarchy import dendrogram
+from sklearn import metrics
+from sklearn import mixture
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import AgglomerativeClustering, FeatureAgglomeration
+from sklearn.metrics import cluster 
+from sklearn.preprocessing import StandardScaler
+import copy
 import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import time
 
 
 def updated_cluster_centers(data,labels,n_clusters):
@@ -195,9 +211,6 @@ def plot_loss_function_history(loss_history,title="K-Means Loss vs. Iterations",
     
 # ----------------------- Problem 4: For GMM --------------------
 
-from sklearn import mixture
-import pandas as pd
-import seaborn as sns
 
 def plot_4D_GMM_clusters(X_train,
                         X_test=None,
@@ -295,8 +308,6 @@ model.children_ : describes the binary tree of the clustering
 """
 
 
-from scipy.cluster.hierarchy import dendrogram
-from matplotlib import pyplot as plt
 def dendrogram_leaves_ordered(model,**kwargs):
     """
     Gets the order of the leaves in the dendrogram
@@ -353,7 +364,6 @@ def dendrogram_HC(model,p = 10000,
         plt.show()
         
 
-import networkx as nx
 def dendrogram_graph_from_model(model):
     """
     Purpose: will return the dendrogram as a grpah object
@@ -368,7 +378,6 @@ def dendrogram_graph_from_model(model):
     return G
     
     
-import networkx_utils as xu
 
 def closest_k_nodes_on_dendrogram(
     node,
@@ -391,9 +400,7 @@ def closest_k_nodes_on_dendrogram(
         verbose = verbose
     )
 
-
-from sklearn.cluster import AgglomerativeClustering, FeatureAgglomeration
-import clustering_ml as clu
+#from machine_learning_tools import clustering_ml as clu
 def closet_k_neighbors_from_hierarchical_clustering(
     X,
     node_name,
@@ -428,11 +435,9 @@ def closet_k_neighbors_from_hierarchical_clustering(
     return [str(k) for k in text_ids[closest_neighbors]]
     
         
-from sklearn.cluster import AgglomerativeClustering
 
 
 # --------------- metrics for evaluating clusters -------------
-from sklearn import metrics
 def purity_score(labels_true,labels_pred,verbose = False):
     # compute contingency matrix (also called confusion matrix)
     contingency_matrix = metrics.cluster.contingency_matrix(labels_true, labels_pred)
@@ -444,7 +449,6 @@ def purity_score(labels_true,labels_pred,verbose = False):
         
     return purity
 
-from sklearn.metrics import cluster 
 def normalized_mutual_info_score(
     labels_true,
     labels_pred,
@@ -468,22 +472,10 @@ def adjusted_rand_score(
     return adjusted_rand_score
 
 # ----------------------- gmm utilitiex (6/30) -------------------------
-from sklearn import mixture
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
-from sklearn.preprocessing import StandardScaler
-import time
-from collections import Counter
-import copy
 
-import matplotlib_utils as mu
-import pandas_utils as pu
-import dimensionality_reduction_utils as dru
 
-from os import sys
 sys.path.append("/notebooks/Neurosignal_Final/PRML/")
 sys.path.append("/neuron_mesh_tools/Neurosignal_Final/PRML/")
 #from prml.rv import VariationalGaussianMixture
@@ -686,7 +678,6 @@ def gmm_classification(gmm_model,curr_data,
     
     return count_values
 
-import pandas as pd
 def gmm_hard_classify(
     model,
     df,
@@ -1106,4 +1097,16 @@ def gmm_pipeline(df,
     
 
 
-import clustering_ml as clu
+
+
+
+
+#--- from machine_learning_tools ---
+from . import dimensionality_reduction_utils as dru
+
+#--- from python_tools ---
+from python_tools import matplotlib_utils as mu
+from python_tools import networkx_utils as xu
+from python_tools import pandas_utils as pu
+
+from . import clustering_ml as clu

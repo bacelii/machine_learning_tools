@@ -1,8 +1,9 @@
-import seaborn as sns
+
+from matplotlib.colors import LogNorm
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas_ml as pdml
 import pandas as pd
+import seaborn as sns
 
 figsize_default = (10,10)
 
@@ -79,7 +80,6 @@ def hist2D(x_df,y_df,n_bins = 100,cbar=True,**kwargs):
            )
     
 
-from matplotlib.colors import LogNorm
 
 """
 Arguments to set for heatmap:
@@ -93,7 +93,6 @@ annot_kws={
     'fontfamily': 'serif'
 }
 """
-import matplotlib_utils as mu
 def heatmap(df,
             cmap ="Blues",# sns.cm.rocket_r,
             annot=True,
@@ -134,7 +133,6 @@ def heatmap(df,
     
     return ax
 
-import matplotlib.pyplot as plt
 def save_plot_as_png(
     sns_plot,
     filename = "seaborn_plot.png"
@@ -145,9 +143,6 @@ def save_plot_as_png(
     fig.savefig(filename) 
     
     
-import numpy_utils as nu
-import pandas_utils as pu
-import statistics_utils as stu
 def pairwise_hist2D(
     df,
     reject_outliers = True,
@@ -230,4 +225,16 @@ def pairwise_hist2D(
     if return_data:
         return data
 
-import seaborn_ml as sml
+
+
+
+#--- from machine_learning_tools ---
+from . import pandas_ml as pdml
+
+#--- from python_tools ---
+from python_tools import matplotlib_utils as mu
+from python_tools import numpy_utils as nu
+from python_tools import pandas_utils as pu
+from python_tools import statistics_utils as stu
+
+from . import seaborn_ml as sml

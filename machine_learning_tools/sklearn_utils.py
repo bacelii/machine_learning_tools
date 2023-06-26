@@ -1,9 +1,7 @@
-import sklearn
-import sklearn.datasets as datasets
-import pandas as pd
+'''
 
 
-"""
+
 Important notes: 
 
 sklearn.utils.Bunch: just an extended dictionary that allows attributes to referenced
@@ -13,7 +11,21 @@ by  key, bunch["value_key"], or by an attribute, bunch.value_key
 Notes: 
 R^2 number: lm2.score(X, y)
 
-"""
+
+
+
+'''
+from sklearn.datasets import make_regression
+from sklearn.metrics import mean_squared_error, log_loss
+from sklearn.model_selection import KFold 
+from sklearn.model_selection import train_test_split
+from tqdm.notebook import tqdm
+import numpy as np
+import pandas as pd
+import sklearn
+import sklearn.datasets as datasets
+
+
 
 
 def dataset_df(dataset_name,
@@ -54,7 +66,6 @@ def load_boston():
               target_name="MEDV")
 
 
-from sklearn.metrics import mean_squared_error, log_loss
 def MSE(y_true,y_pred=None,model=None,X = None,clf=None):
     """
     Purpose: Will calculate the MSE of a model
@@ -94,7 +105,6 @@ def accuracy(clf,X,y):
     
     return clf.score(X, y)
 
-from sklearn.model_selection import train_test_split
 def train_val_test_split(
     X,
     y,
@@ -182,8 +192,6 @@ def train_val_test_split(
     else:
         return X_train,X_val,X_test,y_train,y_val,y_test
 
-import pandas as pd
-from sklearn.model_selection import KFold 
 
 def k_fold_df_split(
     X,
@@ -284,7 +292,7 @@ ret_df
     
     
     if plot_loss:
-        import pandas_ml as pdml
+        from machine_learning_tools import pandas_ml as pdml
         pdml.plot_df_x_y_with_std_err(
         best_subset_df,
         x_column= parameter_name,
@@ -300,8 +308,6 @@ ret_df
 
     
     
-from sklearn.datasets import make_regression
-import numpy as np
 def random_regression_with_informative_features(
     n_samples=306,
     n_features=8000,
@@ -330,8 +336,6 @@ def random_regression_with_informative_features(
     else:
         return X,y
     
-import pandas as pd
-from tqdm.notebook import tqdm
 def CV_optimal_param_1D(
     parameter_options,
     clf_function,
@@ -541,4 +545,7 @@ def CV_optimal_param_1D(
 def accuracy_score(y_true,y_pred,**kwargs):
     return sklearn.metrics.accuracy_score(y_true,y_pred,**kwargs)
 
-import sklearn_utils as sklu
+
+
+
+from . import sklearn_utils as sklu

@@ -1,7 +1,13 @@
+
+from matplotlib.ticker import MaxNLocator
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn import decomposition
+from sklearn import decomposition,manifold
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn import decomposition
-from matplotlib.ticker import MaxNLocator
+import pandas as pd
+import time
+import umap
 
 
 
@@ -234,9 +240,6 @@ def pca_analysis(data,
 
 
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import numpy_ml as nu
 def plot_projected_data(data_proj,
                         labels=None, # should be a number
                         axis_prefix="",
@@ -352,7 +355,6 @@ def plot_projected_data_2D(data_proj,labels=None,axis_prefix="Proj",
     plt.show()
     
 
-import matplotlib.pyplot as plt
 def plot_um(UM,height=8,width=4,title="Imshow of the UM matrix"):
     fig,ax = plt.subplots(1,1)
     fig.set_size_inches(width,height)
@@ -453,9 +455,7 @@ def second_largest_eigenvector_proj(data,
                          plot_perc_variance_explained = plot_perc_variance_explained,
                          **kwargs)
 
-# ========== intro to machine learning dimension reduction techniques =========
-from sklearn import decomposition,manifold
-import umap
+# ========== intro to machine learning dimension reduction techniques =========,manifold
 
 dimensionality_reduction_methods = {
     "isomap":manifold.Isomap,
@@ -478,8 +478,6 @@ def dimensionality_reduction_by_umap(
     
     pass
 
-import visualizations_ml as vml
-import time
 def dimensionality_reduction_by_method(
     X,
     method="umap",
@@ -546,7 +544,6 @@ def dimensionality_reduction_by_method(
     return X_trans
         
     
-import pandas as pd
 def add_dimensionality_reduction_embeddings_to_df(
     df,
     method = "UMAP",
@@ -580,4 +577,10 @@ def add_dimensionality_reduction_embeddings_to_df(
     
 
     
-import dimensionality_reduction_ml as dru
+
+
+#--- from machine_learning_tools ---
+from . import numpy_ml as nu
+from . import visualizations_ml as vml
+
+from . import dimensionality_reduction_ml as dru

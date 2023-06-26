@@ -1,4 +1,7 @@
-"""
+'''
+
+
+
 Purpose: Storing models that were
 implemented in sklearn and tested/created easier api
 
@@ -12,14 +15,23 @@ model.interecpt_
 model.score(X,y) --> gives the r2 of the prediction
 model.alpha_ --> the LaGrange multiplier after the fit
 
-"""
-import pandas_ml as pdml
+
+
+
+'''
+from sklearn import ensemble 
+from sklearn import linear_model
+from sklearn import svm
+from sklearn import tree 
+from sklearn.inspection import permutation_importance
+from sklearn.utils import class_weight
+import matplotlib.pyplot as plt
+import numpy as np
+import time
 
 def clf_name(clf):
     return str(clf).split("(")[0]
 
-from sklearn.utils import class_weight
-import numpy as np
 def compute_class_weight(y):
     class_weights = class_weight.compute_class_weight('balanced',
                                                  classes=np.unique(y),
@@ -31,7 +43,6 @@ Notes:
 alpha in most models is the LaGrange lambda
 
 """
-from sklearn import linear_model
 
 def LinearRegression(**kwargs):
     return linear_model.LinearRegression(**kwargs)
@@ -119,7 +130,6 @@ def Ridge(
         fit_intercept = fit_intercept
     )
 
-import numpy as np
 
 
 def AdaptiveLasso(X,y,
@@ -228,7 +238,6 @@ def AdaptiveLasso(X,y,
     
     return clf
 
-import numpy as np
 def ranked_features(model,
                     feature_names=None,
                    verbose = False):
@@ -261,8 +270,6 @@ def ranked_features(model,
 
     
 # ---------- Modeul visualizations for those with lambda parametere ----
-import numpy as np
-import matplotlib.pyplot as plt
 
 def set_legend_outside_plot(ax,scale_down=0.8):
     """
@@ -374,7 +381,6 @@ def LogisticRegression(**kwargs):
     """
     return linear_model.LogisticRegression(**kwargs)
 
-from sklearn import svm
 
 def SVC(kernel="rbf",
         C = 1,
@@ -391,8 +397,6 @@ def SVC(kernel="rbf",
 
 
 #================= ============== Tree based models ================= ==============
-from sklearn import ensemble 
-from sklearn import tree 
 
 ensemble.RandomForestClassifier
 ensemble.BaggingClassifier
@@ -742,9 +746,6 @@ def is_ensemble(clf):
     else:
         return False
 
-import visualizations_ml as vml
-import time
-from sklearn.inspection import permutation_importance
 def feature_importances(
     clf,
     verbose = True,
@@ -828,4 +829,10 @@ def feature_importances(
     else:
         return importances
     
-import sklearn_models as sklm
+
+
+#--- from machine_learning_tools ---
+from . import pandas_ml as pdml
+from . import visualizations_ml as vml
+
+from . import sklearn_models as sklm

@@ -1,17 +1,22 @@
-"""
+'''
+
+
+
 Functions to help with featuer evaluation
 
 
-"""
+
+
+
+'''
+from sklearn.feature_selection import chi2, f_regression
+import itertools
+import numpy as np
+import sklearn.feature_selection as fs
 
 # ------ Evaluation of models ---------
 
-import sklearn_models as sklm
-import sklearn_utils as sklu
-import pandas_ml as pml
-import numpy as np
 
-import itertools
 
 all_evaluation_methods = ["R_squared","MSE"]
 
@@ -98,8 +103,6 @@ def best_subset_k(
     else:
         return winning_features
 
-import sklearn.feature_selection as fs
-from sklearn.feature_selection import chi2, f_regression
 def best_subset_k_individual_sklearn(df,
                          target_name,
                          k,
@@ -173,7 +176,6 @@ def best_subset_k_individual_sklearn(df,
     else:
         return best_sub
     
-import sklearn.feature_selection as fs
 def reverse_feature_elimination(df,
                                 k,
                                 model,
@@ -209,3 +211,9 @@ def reverse_feature_elimination(df,
     else:
         return best_features
     
+
+
+#--- from machine_learning_tools ---
+from . import pandas_ml as pml
+from . import sklearn_models as sklm
+from . import sklearn_utils as sklu

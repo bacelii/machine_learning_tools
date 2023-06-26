@@ -1,0 +1,17 @@
+graphviz>=0.16
+ipython
+matplotlib>=3.3.4
+networkx>=2.5
+numpy>=1.19.5
+pandas>=1.1.5
+#pyreadr>=0.4.7
+python_tools>=0.0.1
+scikit_learn
+scipy>=1.5.4
+seaborn>=0.11.2
+statsmodels>=0.11.1
+tqdm>=4.62.2
+trimesh>=3.9.0
+umap_learn>=0.5.3
+webcolors>=1.11.1
+ipython_genutils

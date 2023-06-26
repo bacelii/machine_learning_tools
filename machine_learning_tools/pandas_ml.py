@@ -1,4 +1,7 @@
-"""
+'''
+
+
+
 Purpose: pandas functions that are useful for machine learning
 
 
@@ -6,10 +9,15 @@ Purpose: pandas functions that are useful for machine learning
 ex: df_test.iloc[:5] --> gets first 5 rows
 .loc: indexes with strings
 Ex: df_test.loc[df.columns,df.columns[:5]]
-"""
-    
-import pandas as pd
+
+
+
+'''
+from pathlib import Path
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+    
     
 def df_no_target(df,target_name):
     return df[[k for k in df.columns if k != target_name]]
@@ -104,7 +112,6 @@ def split_df_by_target(df,target_name):
 
 
 # ========= pandas visualizations ==============
-import matplotlib.pyplot as plt
 def plot_df_x_y_with_std_err(
     df,
     x_column,
@@ -120,7 +127,7 @@ def plot_df_x_y_with_std_err(
     an associated standard error with it
     
     Example: 
-    import pandas_ml as pdml
+    from machine_learning_tools import pandas_ml as pdml
     pdml.plot_df_x_y_with_std_err(
     df,
         x_column= "C",
@@ -155,7 +162,6 @@ def plot_df_x_y_with_std_err(
 def csv_to_df(csv_filepath):
     return pd.read_csv(csv_filepath) 
     
-from pathlib import Path
 def df_to_csv(df,
               output_filename="df.csv",
               output_folder = "./",
@@ -216,4 +222,7 @@ def gzip_to_df(filepath):
 
     
     
-import pandas_ml as pdml
+
+
+
+from . import pandas_ml as pdml

@@ -1,5 +1,8 @@
-import sklearn.metrics as metrics
+
+import numpy as np
 import pandas as pd
+import seaborn as sns
+import sklearn.metrics as metrics
 
 def confusion_matrix(
     y_true,
@@ -29,10 +32,6 @@ def confusion_matrix(
     else:
         return return_matrix
     
-import seaborn as sns
-import matplotlib_utils as mu
-import numpy as np
-import pandas_utils as pu
 def normalize_confusion_matrix(
     cf_matrix,
     axis = 1,
@@ -96,4 +95,10 @@ def plot_confusion_matrix(
 
     return ax
     
-import evaluation_metrics_utils as emu
+
+
+#--- from python_tools ---
+from python_tools import matplotlib_utils as mu
+from python_tools import pandas_utils as pu
+
+from . import evaluation_metrics_utils as emu

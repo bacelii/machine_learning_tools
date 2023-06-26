@@ -1,7 +1,12 @@
-import pandas_ml as pdml
-import numpy as np
-import matplotlib_ml as mu
+
+from IPython.display import SVG
+from IPython.display import display   
+from graphviz import Source
+from matplotlib.colors import ListedColormap
+from sklearn.tree import export_graphviz
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 
 def color_list_for_y(y,color_list = None):
@@ -85,9 +90,6 @@ def meshgrid_for_plot(
     else:
         return output_grid
     
-from matplotlib.colors import ListedColormap
-import pandas_ml as pdml
-import numpy_ml as nu
 def contour_map_for_2D_classifier(
     clf,
     axes_min_default = -10,
@@ -275,7 +277,7 @@ def plot_df_scatter_3d_classification(
     Ex: 
     %matplotlib notebook
     sys.path.append("/machine_learning_tools/machine_learning_tools/")
-    import visualizations_ml as vml
+    from machine_learning_tools import visualizations_ml as vml
     vml.plot_df_scatter_3d_classification(df,target_name="group_label",
                                          feature_names= [
         #"ipr_eig_xz_to_width_50",
@@ -356,7 +358,7 @@ def plot_df_scatter_2d_classification(
     Ex: 
     %matplotlib notebook
     sys.path.append("/machine_learning_tools/machine_learning_tools/")
-    import visualizations_ml as vml
+    from machine_learning_tools import visualizations_ml as vml
     vml.plot_df_scatter_3d_classification(df,target_name="group_label",
                                          feature_names= [
         #"ipr_eig_xz_to_width_50",
@@ -372,7 +374,7 @@ def plot_df_scatter_2d_classification(
         y = y[y != "Unknown"],
     )
 
-    import matplotlib_utils as mu
+    from python_tools import matplotlib_utils as mu
     mu.set_legend_outside_plot(ax)
     
     """
@@ -446,7 +448,7 @@ def plot_df_scatter_2d_classification(
     y = y[y != "Unknown"],
     )
 
-    import matplotlib_utils as mu
+    from python_tools import matplotlib_utils as mu
     ax = mu.set_legend_outside_plot(ax)
     """
     
@@ -482,8 +484,6 @@ def plot_df_scatter_2d_classification(
         **kwargs
     )'''
     
-import matplotlib_utils as mu
-import pandas_utils as pu
 def plot_df_scatter_classification(
     df=None,
     target_name = None,
@@ -533,7 +533,7 @@ def plot_df_scatter_classification(
     Ex: 
     %matplotlib notebook
     sys.path.append("/machine_learning_tools/machine_learning_tools/")
-    import visualizations_ml as vml
+    from machine_learning_tools import visualizations_ml as vml
     vml.plot_df_scatter_3d_classification(df,target_name="group_label",
                                          feature_names= [
         #"ipr_eig_xz_to_width_50",
@@ -681,9 +681,6 @@ def plot_svm_kernels(clf, X, y, X_test=None,title = None):
         plt.title(str(clf.kernel))
     plt.show()
     
-import pandas as pd
-import numpy as np
-import sklearn_models as sklm
 def plot_feature_importance(clf,
                             feature_names = None,
                            sort_features=True,
@@ -723,11 +720,7 @@ def plot_feature_importance(clf,
     
     
     
-from IPython.display import SVG
-from graphviz import Source
-from IPython.display import display   
 
-from sklearn.tree import export_graphviz
 
 def plot_decision_tree(clf,
                       feature_names,
@@ -753,9 +746,6 @@ def plot_decision_tree(clf,
     display(SVG(graph.pipe(format='svg')))
     
     
-import numpy_utils as nu
-import visualizations_ml as vml
-import dimensionality_reduction_ml as dru
 def plot_dim_red_analysis(
     X,
     method,
@@ -810,8 +800,8 @@ def plot_binary_classifier_map(
     figure_height = 10,
     axes_fontsize = 25,
 
-    class_0_color = mu.colorblind_blue,
-    class_1_color = mu.colorblind_orange,
+    class_0_color = None,#mu.colorblind_blue,
+    class_1_color = None,#mu.colorblind_orange,
     mid_color = "white",
     alpha = 0.5,
     plot_colorbar = True,
@@ -839,7 +829,7 @@ def plot_binary_classifier_map(
 
 
     ======Example:=======
-    import visualizations_ml as vml
+    from machine_learning_tools import visualizations_ml as vml
 
     figure_width = 10
     figure_height = 10
@@ -859,6 +849,13 @@ def plot_binary_classifier_map(
         ax = ax,
     )
     """
+    if class_0_color is None:
+        class_0_color = mu.colorblind_blue
+    if class_1_color is None:
+        class_1_color = mu.colorblind_orange
+    
+    
+    
     
     if xmin is None:
         xmin = X[:, 0].min() - buffer
@@ -910,7 +907,24 @@ def plot_binary_classifier_map(
     
     return ax
 
-import evaluation_metrics_utils as emu
+
+
+
+
+#--- from machine_learning_tools ---
+from . import dimensionality_reduction_ml as dru
+from . import evaluation_metrics_utils as emu
+from . import matplotlib_ml as mu
+from . import numpy_ml as nu
+from . import pandas_ml as pdml
+from . import sklearn_models as sklm
+
 plot_confusion_matrix = emu.plot_confusion_matrix
     
-import visualizations_ml as vml
+
+#--- from python_tools ---
+from python_tools import matplotlib_utils as mu
+from python_tools import numpy_utils as nu
+from python_tools import pandas_utils as pu
+
+from . import visualizations_ml as vml

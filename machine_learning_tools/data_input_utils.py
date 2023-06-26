@@ -1,6 +1,7 @@
-import pyreadr
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 
 def df_from_rda(filepath,verbose = True,
                reset_index= False,
@@ -11,6 +12,7 @@ def df_from_rda(filepath,verbose = True,
     
     """
     
+    import pyreadr
     result = pyreadr.read_r('./authors.rda') # also works for Rds, rda
 
     # done! let's see what we got
@@ -27,3 +29,5 @@ def df_from_rda(filepath,verbose = True,
             df[curr_key] = df.index.values
         df.index = np.arange(len(df.index.values))
     return df
+
+
