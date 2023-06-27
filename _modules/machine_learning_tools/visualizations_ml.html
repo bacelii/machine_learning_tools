@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>machine_learning_tools.visualizations_ml &mdash; machine-learning-tools  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            machine-learning-tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">machine_learning_tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">machine-learning-tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">machine_learning_tools.visualizations_ml</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for machine_learning_tools.visualizations_ml</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>   
+<span class="kn">from</span> <span class="nn">graphviz</span> <span class="kn">import</span> <span class="n">Source</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">export_graphviz</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<div class="viewcode-block" id="color_list_for_y"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.color_list_for_y">[docs]</a><span class="k">def</span> <span class="nf">color_list_for_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">color_list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">y_unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">color_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">color_list</span> <span class="o">=</span>  <span class="n">mu</span><span class="o">.</span><span class="n">generate_non_randon_named_color_list</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_unique</span><span class="p">))</span>
+        
+    <span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">y_unique</span><span class="p">,</span><span class="n">color_list</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">palette</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">y</span><span class="p">]</span></div>
+        
+    
+<div class="viewcode-block" id="meshgrid_for_plot"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.meshgrid_for_plot">[docs]</a><span class="k">def</span> <span class="nf">meshgrid_for_plot</span><span class="p">(</span>
+    <span class="n">axes_min_default</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">axes_max_default</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">axes_step_default</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">axes_min_max_step_dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_combined_coordinates</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To generate a meshgrid for plotting</span>
+<span class="sd">    that is configured as a mixutre of custom</span>
+<span class="sd">    and default values</span>
+<span class="sd">    </span>
+<span class="sd">    axes_min_max_step_dict must be a dictionary mapping</span>
+<span class="sd">    the class label or classs index to a </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    vml.meshgrid_for_plot(</span>
+<span class="sd">    axes_min_default = -20,</span>
+<span class="sd">    axes_max_default = 10,</span>
+<span class="sd">    axes_step_default = 1,</span>
+<span class="sd">    #axes_min_max_step_dict = {1:[-2,2,0.5]},</span>
+<span class="sd">    axes_min_max_step_dict = {1:dict(axis_min = -2,axis_max = 3,axis_step = 1)},</span>
+<span class="sd">    n_axis = 2,</span>
+<span class="sd">    clf = None,</span>
+<span class="sd">    )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_axis</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">n_features_in_</span>
+    
+    <span class="n">axes_default</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">axes_min_default</span><span class="p">,</span><span class="n">axes_max_default</span><span class="o">+</span><span class="mf">0.01</span><span class="p">,</span><span class="n">axes_step_default</span><span class="p">)]</span><span class="o">*</span><span class="n">n_axis</span>
+    <span class="k">if</span> <span class="n">axes_min_max_step_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">axis_key</span><span class="p">,</span><span class="n">axis_value</span> <span class="ow">in</span> <span class="n">axes_min_max_step_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">axis_key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="n">axis_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">classes_</span> <span class="o">==</span> <span class="n">axis_key</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">axis_idx</span> <span class="o">=</span> <span class="n">axis_key</span>
+
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">axis_value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">a_min</span> <span class="o">=</span> <span class="n">axis_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">a_min</span> <span class="o">=</span> <span class="n">axes_min_default</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">a_max</span> <span class="o">=</span> <span class="n">axis_value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">a_max</span> <span class="o">=</span> <span class="n">axes_max_default</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">a_step</span> <span class="o">=</span> <span class="n">axis_value</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">a_step</span> <span class="o">=</span> <span class="n">axes_step_default</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">a_min</span> <span class="o">=</span> <span class="n">axis_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;axis_min&quot;</span><span class="p">,</span><span class="n">axes_min_default</span><span class="p">)</span>
+                <span class="n">a_max</span> <span class="o">=</span> <span class="n">axis_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;axis_max&quot;</span><span class="p">,</span><span class="n">axes_max_default</span><span class="p">)</span>
+                <span class="n">a_step</span> <span class="o">=</span> <span class="n">axis_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;axis_step&quot;</span><span class="p">,</span><span class="n">axes_step_default</span><span class="p">)</span>
+                
+            <span class="n">axes_default</span><span class="p">[</span><span class="n">axis_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">a_min</span><span class="p">,</span><span class="n">a_max</span><span class="o">+</span><span class="mf">0.01</span><span class="p">,</span><span class="n">a_step</span><span class="p">)</span>
+    
+    <span class="n">output_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">axes_default</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_combined_coordinates</span><span class="p">:</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">output_grid</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">return</span> <span class="n">grid</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">output_grid</span></div>
+    
+<div class="viewcode-block" id="contour_map_for_2D_classifier"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.contour_map_for_2D_classifier">[docs]</a><span class="k">def</span> <span class="nf">contour_map_for_2D_classifier</span><span class="p">(</span>
+    <span class="n">clf</span><span class="p">,</span>
+    <span class="n">axes_min_default</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">axes_max_default</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">axes_step_default</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">axes_min_max_step_dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">axes_limit_buffers</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    
+
+    <span class="n">figure_width</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">figure_height</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+
+    <span class="n">color_type</span> <span class="o">=</span> <span class="s2">&quot;classes&quot;</span><span class="p">,</span> <span class="c1">#probability (only works if the class has 2 features)</span>
+
+    <span class="c1">#arguments for probability color type</span>
+    <span class="n">color_prob_axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">contour_color_map</span> <span class="o">=</span> <span class="s2">&quot;RdBu&quot;</span><span class="p">,</span>
+
+    <span class="c1">#arguments for classes color type</span>
+    <span class="n">map_fill_colors</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+
+    <span class="c1"># ------ arguments for plotting training points --------</span>
+    <span class="c1">#arguments for other scatters to plot</span>
+    <span class="n">training_df</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">training_df_class_name</span> <span class="o">=</span> <span class="s2">&quot;class&quot;</span><span class="p">,</span>
+    <span class="n">training_df_feature_names</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;feature_1&quot;</span><span class="p">,</span><span class="s2">&quot;feature_2&quot;</span><span class="p">),</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">scatter_colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;darkorange&quot;</span><span class="p">,</span><span class="s2">&quot;c&quot;</span><span class="p">],</span>
+    <span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To plot the decision boundary </span>
+<span class="sd">    of a classifier that is only dependent on 2 feaures</span>
+
+<span class="sd">    Tried extending this to classifer of more than 2 features</span>
+<span class="sd">    but ran into confusion on how to collapse across the </span>
+<span class="sd">    other dimensions of the features space</span>
+
+<span class="sd">    Ex: </span>
+<span class="sd">    %matplotlib inline</span>
+<span class="sd">    vml.contour_map_for_2D_classifier(ctu.e_i_model)</span>
+<span class="sd">    </span>
+<span class="sd">    #plotting the probability</span>
+<span class="sd">    %matplotlib inline</span>
+<span class="sd">    vml.contour_map_for_2D_classifier(</span>
+<span class="sd">        ctu.e_i_model,</span>
+<span class="sd">        color_type=&quot;probability&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">features_to_plot</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="c1">#could be indexes or feature name</span>
+
+    <span class="n">labels_list</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span><span class="s2">&quot;classes_&quot;</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">axes_limit_buffers</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">convert_to_array_like</span><span class="p">(</span><span class="n">axes_limit_buffers</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes_limit_buffers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">axes_limit_buffers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">axes_limit_buffers</span><span class="p">,</span><span class="n">axes_limit_buffers</span><span class="p">])</span>
+    
+
+
+
+    <span class="n">features_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_list</span><span class="p">)</span> <span class="o">==</span> <span class="n">k</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span>  <span class="k">else</span> <span class="n">k</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">features_to_plot</span><span class="p">]</span>
+
+    <span class="c1">#if color_type == &quot;classes&quot;:</span>
+    <span class="k">if</span> <span class="n">map_fill_colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">map_fill_colors</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">generate_non_randon_named_color_list</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels_list</span><span class="p">))</span>
+        
+    <span class="n">cmap_light</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">map_fill_colors</span><span class="p">)</span>
+    
+
+
+    <span class="k">if</span> <span class="n">scatter_colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scatter_colors</span> <span class="o">=</span> <span class="n">map_fill_colors</span>
+
+
+    <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output_grid</span>  <span class="o">=</span> <span class="n">vml</span><span class="o">.</span><span class="n">meshgrid_for_plot</span><span class="p">(</span>
+                    <span class="n">axes_min_default</span> <span class="o">=</span> <span class="n">axes_min_default</span><span class="p">,</span>
+                    <span class="n">axes_max_default</span> <span class="o">=</span> <span class="n">axes_max_default</span><span class="p">,</span>
+                    <span class="n">axes_step_default</span> <span class="o">=</span> <span class="n">axes_step_default</span><span class="p">,</span>
+                    <span class="n">axes_min_max_step_dict</span> <span class="o">=</span> <span class="n">axes_min_max_step_dict</span><span class="p">,</span>
+            <span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="p">,</span>
+            <span class="n">return_combined_coordinates</span><span class="o">=</span><span class="kc">False</span>
+
+                    <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_mesh_grid_pts</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">x_min</span><span class="p">,</span><span class="n">x_max</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">-</span><span class="n">axes_limit_buffers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">+</span><span class="n">axes_limit_buffers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_min</span><span class="p">,</span><span class="n">y_max</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">-</span><span class="n">axes_limit_buffers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">+</span><span class="n">axes_limit_buffers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">output_grid</span> <span class="o">=</span> <span class="n">vml</span><span class="o">.</span><span class="n">meshgrid_for_plot</span><span class="p">(</span>
+            <span class="n">axes_min_max_step_dict</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="nb">dict</span><span class="p">(</span><span class="n">axis_min</span> <span class="o">=</span> <span class="n">x_min</span><span class="p">,</span><span class="n">axis_max</span> <span class="o">=</span> <span class="n">x_max</span><span class="p">,</span><span class="n">axis_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span><span class="o">-</span><span class="n">x_min</span><span class="p">)</span><span class="o">/</span><span class="n">n_mesh_grid_pts</span><span class="p">),</span>
+                                    <span class="mi">1</span><span class="p">:</span><span class="nb">dict</span><span class="p">(</span><span class="n">axis_min</span> <span class="o">=</span> <span class="n">y_min</span><span class="p">,</span><span class="n">axis_max</span> <span class="o">=</span> <span class="n">y_max</span><span class="p">,</span><span class="n">axis_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span><span class="o">-</span><span class="n">y_min</span><span class="p">)</span><span class="o">/</span><span class="n">n_mesh_grid_pts</span><span class="p">)},</span>
+            <span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="p">,</span>
+            <span class="n">return_combined_coordinates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        
+        
+
+        
+
+    <span class="n">xx</span><span class="p">,</span><span class="n">yy</span> <span class="o">=</span> <span class="n">output_grid</span><span class="p">[</span><span class="n">features_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">output_grid</span><span class="p">[</span><span class="n">features_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">output_grid</span><span class="p">])</span><span class="o">.</span><span class="n">T</span> <span class="c1">#makes into n by n_features array</span>
+
+    <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figure_width</span><span class="p">,</span> 
+                                 <span class="n">figure_height</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">color_type</span> <span class="o">==</span> <span class="s2">&quot;probability&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">color_prob_axis</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">color_prob_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_list</span><span class="p">)</span> <span class="o">==</span> <span class="n">color_prob_axis</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">curr_label_for_prob</span> <span class="o">=</span> <span class="n">labels_list</span><span class="p">[</span><span class="n">color_prob_axis</span><span class="p">]</span>
+
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">grid</span><span class="p">)[:,</span> <span class="n">color_prob_axis</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">contour</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">contour_color_map</span><span class="p">,</span>
+                          <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">ax_c</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">contour</span><span class="p">)</span>
+        <span class="n">ax_c</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$P(y = </span><span class="si">{</span><span class="n">curr_label_for_prob</span><span class="si">}</span><span class="s2">)$&quot;</span><span class="p">)</span>
+        <span class="n">ax_c</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">color_type</span> <span class="o">==</span> <span class="s2">&quot;classes&quot;</span><span class="p">:</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+        <span class="n">classes_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels_list</span><span class="p">)}</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">classes_map</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Z</span><span class="p">])</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">contour</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_light</span><span class="p">)</span>
+        <span class="n">ax_c</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">contour</span><span class="p">)</span>
+        <span class="n">ax_c</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels_list</span><span class="p">))])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unimplemented color_type = </span><span class="si">{</span><span class="n">color_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">training_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">X</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">X_y</span><span class="p">(</span><span class="n">training_df</span><span class="p">,</span><span class="n">training_df_class_name</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">training_df_feature_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">training_df_feature_names</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">X</span><span class="c1"># = X[training_df_feature_names]</span>
+        
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+            
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">X</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">vml</span><span class="o">.</span><span class="n">color_list_for_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">scatter_colors</span><span class="p">),</span>
+                    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                    <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span><span class="n">x_max</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">y_min</span><span class="p">,</span><span class="n">y_max</span><span class="p">)</span>
+        
+    
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">feature_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">feature_names</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="plot_df_scatter_3d_classification"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_df_scatter_3d_classification">[docs]</a><span class="k">def</span> <span class="nf">plot_df_scatter_3d_classification</span><span class="p">(</span>
+    <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    
+    <span class="c1">#plotting features</span>
+    <span class="n">figure_width</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">figure_height</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">axis_append</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span> 
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To plot features in 3D</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    %matplotlib notebook</span>
+<span class="sd">    sys.path.append(&quot;/machine_learning_tools/machine_learning_tools/&quot;)</span>
+<span class="sd">    from machine_learning_tools import visualizations_ml as vml</span>
+<span class="sd">    vml.plot_df_scatter_3d_classification(df,target_name=&quot;group_label&quot;,</span>
+<span class="sd">                                         feature_names= [</span>
+<span class="sd">        #&quot;ipr_eig_xz_to_width_50&quot;,</span>
+<span class="sd">        &quot;center_to_width_50&quot;,</span>
+<span class="sd">        &quot;n_limbs&quot;,</span>
+<span class="sd">        &quot;ipr_eig_xz_max_95&quot;</span>
+<span class="sd">    ])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">target_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">target_name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">df_from_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span><span class="p">)</span>
+    
+    
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">figure_width</span><span class="p">,</span><span class="n">figure_height</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span> <span class="o">=</span> <span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+    
+    <span class="n">split_dfs</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">split_df_by_target</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">df_curr</span> <span class="ow">in</span> <span class="n">split_dfs</span><span class="p">:</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">X_y</span><span class="p">(</span><span class="n">df_curr</span><span class="p">,</span><span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">)</span>
+        
+        <span class="n">curr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Working on label: </span><span class="si">{</span><span class="n">curr_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">feature_names</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">feature_names</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1">#         if verbose:</span>
+<span class="c1">#             print(f&quot;feature_names = {feature_names}&quot;)</span>
+            
+
+        <span class="n">X_curr</span><span class="p">,</span><span class="n">Y_curr</span><span class="p">,</span><span class="n">Z_curr</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span>
+                               <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">]</span>
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_curr</span><span class="p">,</span><span class="n">Y_curr</span><span class="p">,</span><span class="n">Z_curr</span><span class="p">,</span>
+                   <span class="n">label</span><span class="o">=</span><span class="n">curr_label</span><span class="p">,</span>
+                   <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+        
+    
+    <span class="n">label_function</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">lfunc</span><span class="p">,</span><span class="n">ax_title</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">label_function</span><span class="p">,</span><span class="n">feature_names</span><span class="p">):</span>
+        <span class="n">lfunc</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ax_title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">axis_append</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot; vs. &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">mu</span><span class="o">.</span><span class="n">set_legend_outside_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="plot_df_scatter_2d_classification"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_df_scatter_2d_classification">[docs]</a><span class="k">def</span> <span class="nf">plot_df_scatter_2d_classification</span><span class="p">(</span>
+    <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    
+    <span class="c1">#plotting features</span>
+    <span class="n">figure_width</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">figure_height</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">axis_append</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To plot features in 3D</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    %matplotlib notebook</span>
+<span class="sd">    sys.path.append(&quot;/machine_learning_tools/machine_learning_tools/&quot;)</span>
+<span class="sd">    from machine_learning_tools import visualizations_ml as vml</span>
+<span class="sd">    vml.plot_df_scatter_3d_classification(df,target_name=&quot;group_label&quot;,</span>
+<span class="sd">                                         feature_names= [</span>
+<span class="sd">        #&quot;ipr_eig_xz_to_width_50&quot;,</span>
+<span class="sd">        &quot;center_to_width_50&quot;,</span>
+<span class="sd">        &quot;n_limbs&quot;,</span>
+<span class="sd">        &quot;ipr_eig_xz_max_95&quot;</span>
+<span class="sd">    ])</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    ax = vml.plot_df_scatter_2d_classification(</span>
+<span class="sd">        X=X_trans[y!= &quot;Unknown&quot;],</span>
+<span class="sd">        y = y[y != &quot;Unknown&quot;],</span>
+<span class="sd">    )</span>
+
+<span class="sd">    from python_tools import matplotlib_utils as mu</span>
+<span class="sd">    mu.set_legend_outside_plot(ax)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">target_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">target_name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">df_from_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span><span class="p">)</span>
+    
+    
+    <span class="n">fig</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">figure_width</span><span class="p">,</span><span class="n">figure_height</span><span class="p">)</span>
+    
+    <span class="n">split_dfs</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">split_df_by_target</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">df_curr</span> <span class="ow">in</span> <span class="n">split_dfs</span><span class="p">:</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">X_y</span><span class="p">(</span><span class="n">df_curr</span><span class="p">,</span><span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">)</span>
+        
+        <span class="n">curr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Working on label: </span><span class="si">{</span><span class="n">curr_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">feature_names</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">feature_names</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1">#         if verbose:</span>
+<span class="c1">#             print(f&quot;feature_names = {feature_names}&quot;)</span>
+            
+
+        <span class="n">X_curr</span><span class="p">,</span><span class="n">Y_curr</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">]</span>
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_curr</span><span class="p">,</span><span class="n">Y_curr</span><span class="p">,</span>
+                   <span class="n">label</span><span class="o">=</span><span class="n">curr_label</span><span class="p">,</span>
+                   <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+        
+    
+    <span class="n">label_function</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">lfunc</span><span class="p">,</span><span class="n">ax_title</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">label_function</span><span class="p">,</span><span class="n">feature_names</span><span class="p">):</span>
+        <span class="n">lfunc</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ax_title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">axis_append</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot; vs. &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">mu</span><span class="o">.</span><span class="n">set_legend_outside_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+<span class="sd">&#39;&#39;&#39;def plot_df_scatter_classification_old(</span>
+<span class="sd">    df=None,</span>
+<span class="sd">    target_name = None,</span>
+<span class="sd">    feature_names = None,</span>
+<span class="sd">    </span>
+<span class="sd">    #plotting features</span>
+<span class="sd">    figure_width = 10,</span>
+<span class="sd">    figure_height = 10,</span>
+<span class="sd">    alpha = 0.5,</span>
+<span class="sd">    axis_append = &quot;&quot;,</span>
+<span class="sd">    </span>
+<span class="sd">    verbose = False,</span>
+<span class="sd">    X=None,</span>
+<span class="sd">    y = None,</span>
+<span class="sd">    title = None,</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">    ):</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    Ex: </span>
+<span class="sd">    </span>
+<span class="sd">    ax = vml.plot_df_scatter_classification(</span>
+<span class="sd">    X=X_trans[y!= &quot;Unknown&quot;][:,:2],</span>
+<span class="sd">    y = y[y != &quot;Unknown&quot;],</span>
+<span class="sd">    )</span>
+
+<span class="sd">    from python_tools import matplotlib_utils as mu</span>
+<span class="sd">    ax = mu.set_legend_outside_plot(ax)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    if target_name is None:</span>
+<span class="sd">        target_name = &quot;target&quot;</span>
+<span class="sd">    if df is None:</span>
+<span class="sd">        if y is None:</span>
+<span class="sd">            y = [&quot;None&quot;]*len(X)</span>
+<span class="sd">        df = pdml.df_from_X_y(X,y,target_name = target_name)</span>
+<span class="sd">    </span>
+<span class="sd">    if len(df.columns) &lt;= 3:</span>
+<span class="sd">        plot_func = plot_df_scatter_2d_classification</span>
+<span class="sd">    else:</span>
+<span class="sd">        plot_func = plot_df_scatter_3d_classification</span>
+<span class="sd">        </span>
+<span class="sd">    if verbose:</span>
+<span class="sd">        print(f&quot;Using plotting function {plot_func}&quot;)</span>
+<span class="sd">    return plot_func(</span>
+<span class="sd">        df=df,</span>
+<span class="sd">        target_name = target_name,</span>
+<span class="sd">        feature_names = feature_names,</span>
+
+<span class="sd">        #plotting features</span>
+<span class="sd">        figure_width = figure_width,</span>
+<span class="sd">        figure_height = figure_height,</span>
+<span class="sd">        alpha = alpha,</span>
+<span class="sd">        axis_append = axis_append,</span>
+
+<span class="sd">        verbose = verbose,</span>
+<span class="sd">        X=X,</span>
+<span class="sd">        y = y,</span>
+<span class="sd">        title = title,</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">    )&#39;&#39;&#39;</span>
+    
+<div class="viewcode-block" id="plot_df_scatter_classification"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_df_scatter_classification">[docs]</a><span class="k">def</span> <span class="nf">plot_df_scatter_classification</span><span class="p">(</span>
+    <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    
+    <span class="c1">#plotting features</span>
+    <span class="n">figure_width</span> <span class="o">=</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="n">figure_height</span> <span class="o">=</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">axis_append</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_to_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_color</span> <span class="o">=</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+    
+    <span class="c1">#for the legend:</span>
+    <span class="n">plot_legend</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">scale_down_legend</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+    <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.02</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span>
+    
+    <span class="n">ax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+
+    
+    <span class="c1">#--- text to plot ----</span>
+    
+    <span class="c1">#--  a dictionary mapping the name o a coordinate to plot at</span>
+    <span class="n">text_to_plot_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    
+    <span class="c1"># --- whether to compute the dictionary of text to plot from labels</span>
+    <span class="n">use_labels_as_text_to_plot</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    
+    <span class="c1">#labels to plot for each of he datapoints</span>
+    <span class="n">text_to_plot_individual</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    
+    <span class="n">replace_None_with_str_None</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    
+    <span class="c1">#for text parameters:</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To plot features in 3D</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    %matplotlib notebook</span>
+<span class="sd">    sys.path.append(&quot;/machine_learning_tools/machine_learning_tools/&quot;)</span>
+<span class="sd">    from machine_learning_tools import visualizations_ml as vml</span>
+<span class="sd">    vml.plot_df_scatter_3d_classification(df,target_name=&quot;group_label&quot;,</span>
+<span class="sd">                                         feature_names= [</span>
+<span class="sd">        #&quot;ipr_eig_xz_to_width_50&quot;,</span>
+<span class="sd">        &quot;center_to_width_50&quot;,</span>
+<span class="sd">        &quot;n_limbs&quot;,</span>
+<span class="sd">        &quot;ipr_eig_xz_max_95&quot;</span>
+<span class="sd">    ])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">target_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">target_name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">df_from_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span><span class="p">)</span>
+    
+        
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">ndim</span> <span class="o">=</span> <span class="mi">2</span>
+    
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">figure_width</span><span class="p">,</span><span class="n">figure_height</span><span class="p">)</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span> <span class="o">=</span> <span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">figure_width</span><span class="p">,</span><span class="n">figure_height</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">replace_None_with_str_None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pu</span><span class="o">.</span><span class="n">replace_None_with_default</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="s2">&quot;None&quot;</span><span class="p">)</span>
+    
+    <span class="n">split_dfs</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">split_df_by_target</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">df_curr</span> <span class="ow">in</span> <span class="n">split_dfs</span><span class="p">:</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">X_y</span><span class="p">(</span><span class="n">df_curr</span><span class="p">,</span><span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">)</span>
+        
+        <span class="n">curr_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Working on label: </span><span class="si">{</span><span class="n">curr_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">feature_names</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">feature_names</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">target_to_color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">target_to_color</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">curr_label</span><span class="p">,</span><span class="n">default_color</span><span class="p">)</span> 
+            <span class="c1">#c = mu.color_to_rgb(c)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">default_color</span>
+
+<span class="c1">#         if verbose:</span>
+<span class="c1">#             print(f&quot;feature_names = {feature_names}&quot;)</span>
+            
+
+        <span class="n">curr_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span>
+                               <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ndim</span><span class="p">]</span> 
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">curr_data</span><span class="p">,</span>
+                   <span class="n">label</span><span class="o">=</span><span class="n">curr_label</span><span class="p">,</span>
+                   <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span>
+                   <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">label_function</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">label_function</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">,</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">lfunc</span><span class="p">,</span><span class="n">ax_title</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">label_function</span><span class="p">,</span><span class="n">feature_names</span><span class="p">):</span>
+        <span class="n">lfunc</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ax_title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">axis_append</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        
+    <span class="c1"># Doing the plotting of the labels</span>
+    
+    
+    <span class="k">if</span> <span class="n">text_to_plot_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">use_labels_as_text_to_plot</span><span class="p">:</span> 
+        <span class="n">X</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">X_y</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">)</span>
+        <span class="n">mu</span><span class="o">.</span><span class="n">text_overlay</span><span class="p">(</span>
+            <span class="n">ax</span><span class="p">,</span>
+            <span class="n">text_to_plot_dict</span><span class="o">=</span><span class="n">text_to_plot_dict</span><span class="p">,</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+    
+    
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot; vs. &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">plot_legend</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">mu</span><span class="o">.</span><span class="n">set_legend_outside_plot</span><span class="p">(</span>
+            <span class="n">ax</span><span class="p">,</span>
+            <span class="c1">#scale_down=scale_down_legend,</span>
+            <span class="n">bbox_to_anchor</span> <span class="o">=</span> <span class="n">bbox_to_anchor</span><span class="p">,</span>
+            <span class="c1">#loc = &quot;center left&quot;</span>
+        <span class="p">)</span>
+    
+    
+    
+    <span class="k">return</span> <span class="n">ax</span></div>
+    
+
+
+    
+    
+<span class="c1">#Plotting function</span>
+<div class="viewcode-block" id="plot_svm_kernels"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_svm_kernels">[docs]</a><span class="k">def</span> <span class="nf">plot_svm_kernels</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">title</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="c1">#     import warnings</span>
+<span class="c1">#     import logging,sys</span>
+<span class="c1">#     warnings.filterwarnings(&#39;ignore&#39;)</span>
+<span class="c1">#     logging.disable(sys.maxsize)</span>
+    
+    <span class="c1">#Plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Paired</span><span class="p">,</span>
+                <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="c1"># Circle out the test data</span>
+    <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_test</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_test</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">facecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                    <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+    <span class="n">x_min</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">x_max</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">y_min</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">y_max</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+    <span class="n">XX</span><span class="p">,</span> <span class="n">YY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="n">x_min</span><span class="p">:</span><span class="n">x_max</span><span class="p">:</span><span class="mi">200</span><span class="n">j</span><span class="p">,</span> <span class="n">y_min</span><span class="p">:</span><span class="n">y_max</span><span class="p">:</span><span class="mi">200</span><span class="n">j</span><span class="p">]</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">XX</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">YY</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span>
+
+    <span class="c1"># Put the result into a color plot</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">XX</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span> <span class="n">YY</span><span class="p">,</span> <span class="n">Z</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Paired</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">XX</span><span class="p">,</span> <span class="n">YY</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">],</span>
+                <span class="n">linestyles</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">],</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.5</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">kernel</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="plot_feature_importance"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_feature_importance">[docs]</a><span class="k">def</span> <span class="nf">plot_feature_importance</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span>
+                            <span class="n">feature_names</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">sort_features</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">n_features_to_plot</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                           <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Feature Importance&quot;</span><span class="p">,</span>
+                            <span class="n">importances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">std</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will plot the feature importance of a classifier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">importances</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">std</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">importances</span><span class="p">,</span><span class="n">std</span> <span class="o">=</span> <span class="n">sklm</span><span class="o">.</span><span class="n">feature_importances</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span>
+                                                   <span class="n">return_std</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">feature_names</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;feature_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">importances</span><span class="p">))])</span>
+    
+    <span class="k">if</span> <span class="n">sort_features</span><span class="p">:</span>
+        <span class="n">sort_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">importances</span><span class="p">))</span>
+        <span class="n">importances</span> <span class="o">=</span> <span class="n">importances</span><span class="p">[</span><span class="n">sort_idx</span><span class="p">]</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">sort_idx</span><span class="p">]</span>
+    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">importances</span><span class="o">=</span><span class="n">importances</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="n">feature_names</span><span class="p">,</span><span class="n">std</span><span class="o">=</span><span class="n">std</span><span class="p">))</span>
+    
+    <span class="c1">#doing the filtering of the features</span>
+    <span class="k">if</span> <span class="n">n_features_to_plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">&gt;</span><span class="n">n_features_to_plot</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">n_features_to_plot</span><span class="p">,:]</span>
+
+    <span class="c1">#doing the plotting</span>
+    <span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;importances&quot;</span><span class="p">,</span><span class="n">yerr</span><span class="o">=</span><span class="s2">&quot;std&quot;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    
+    
+    
+
+
+<div class="viewcode-block" id="plot_decision_tree"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_decision_tree">[docs]</a><span class="k">def</span> <span class="nf">plot_decision_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span>
+                      <span class="n">feature_names</span><span class="p">,</span>
+                      <span class="n">class_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will show the </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">class_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">class_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span>
+    
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">export_graphviz</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span>
+                        <span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span>
+      <span class="p">,</span> <span class="n">out_file</span><span class="o">=</span><span class="kc">None</span>
+      <span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="n">feature_names</span>
+      <span class="p">,</span> <span class="n">class_names</span><span class="o">=</span><span class="n">class_names</span>
+      <span class="p">,</span> <span class="n">filled</span> <span class="o">=</span> <span class="kc">True</span>
+      <span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;clf.classes_ = </span><span class="si">{</span><span class="n">clf</span><span class="o">.</span><span class="n">classes_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">SVG</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;svg&#39;</span><span class="p">)))</span></div>
+    
+    
+<div class="viewcode-block" id="plot_dim_red_analysis"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_dim_red_analysis">[docs]</a><span class="k">def</span> <span class="nf">plot_dim_red_analysis</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_components</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">color_mapppings</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_kwargs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="c1">#dict(),</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+    
+    <span class="k">if</span> <span class="n">plot_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plot_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    
+    <span class="n">n_components</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">convert_to_array_like</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span>
+    <span class="n">color_mapppings</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">convert_to_array_like</span><span class="p">(</span><span class="n">color_mapppings</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">ndim</span> <span class="ow">in</span> <span class="n">n_components</span><span class="p">:</span>
+        <span class="n">X_trans</span> <span class="o">=</span> <span class="n">dru</span><span class="o">.</span><span class="n">dimensionality_reduction_by_method</span><span class="p">(</span>
+        <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">,</span>
+        <span class="n">n_components</span> <span class="o">=</span><span class="n">ndim</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="n">color_mapppings</span><span class="p">:</span>
+            <span class="n">vml</span><span class="o">.</span><span class="n">plot_df_scatter_classification</span><span class="p">(</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">X_trans</span><span class="p">,</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span>
+                <span class="n">target_to_color</span> <span class="o">=</span> <span class="n">cm</span><span class="p">,</span>
+                <span class="n">ndim</span> <span class="o">=</span> <span class="n">ndim</span><span class="p">,</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">plot_kwargs</span>
+                
+            <span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    
+    
+<div class="viewcode-block" id="plot_binary_classifier_map"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.visualizations_ml.plot_binary_classifier_map">[docs]</a><span class="k">def</span> <span class="nf">plot_binary_classifier_map</span><span class="p">(</span>
+    <span class="n">clf</span><span class="p">,</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">xmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ymin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ymax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">class_idx_to_plot</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="c1">#plotting</span>
+    <span class="n">figure_width</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">figure_height</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">axes_fontsize</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+
+    <span class="n">class_0_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="c1">#mu.colorblind_blue,</span>
+    <span class="n">class_1_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="c1">#mu.colorblind_orange,</span>
+    <span class="n">mid_color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">plot_colorbar</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">colorbar_label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">colorbar_labelpad</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="n">colorbar_label_fontsize</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">colorbar_tick_fontsize</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+    
+    <span class="n">ax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Purpose: To plot the prediction</span>
+<span class="sd">    map of a binary classifier</span>
+
+<span class="sd">    Arguments: </span>
+<span class="sd">    1) Model</span>
+<span class="sd">    2) Define the input space want to test over</span>
+<span class="sd">    (xmin,xmax)</span>
+
+<span class="sd">    Pseudocode: </span>
+<span class="sd">    1) Create a meshgrid of the input space</span>
+<span class="sd">    2) Send the prediction</span>
+
+
+<span class="sd">    ======Example:=======</span>
+<span class="sd">    from machine_learning_tools import visualizations_ml as vml</span>
+
+<span class="sd">    figure_width = 10</span>
+<span class="sd">    figure_height = 10</span>
+<span class="sd">    fig,ax = plt.subplots(1,1,figsize=(figure_width,figure_height))</span>
+
+<span class="sd">    X = df_plot[trans_cols].to_numpy().astype(&quot;float&quot;)</span>
+
+<span class="sd">    vml.plot_binary_classifier_map(</span>
+<span class="sd">        clf = ctu.e_i_model,</span>
+<span class="sd">        X = X,</span>
+<span class="sd">        xmin = 0,</span>
+<span class="sd">        xmax = 4.5,</span>
+<span class="sd">        ymin=-0.1,</span>
+<span class="sd">        ymax = 1.2,</span>
+<span class="sd">        alpha = 0.5,</span>
+<span class="sd">        colorbar_label = &quot;Excitatory Probability&quot;,</span>
+<span class="sd">        ax = ax,</span>
+<span class="sd">    )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">class_0_color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">class_0_color</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">colorblind_blue</span>
+    <span class="k">if</span> <span class="n">class_1_color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">class_1_color</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">colorblind_orange</span>
+    
+    
+    
+    
+    <span class="k">if</span> <span class="n">xmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">buffer</span>
+
+    <span class="k">if</span> <span class="n">xmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">buffer</span>
+
+    <span class="k">if</span> <span class="n">ymin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">buffer</span>
+
+    <span class="k">if</span> <span class="n">ymax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">buffer</span>
+
+
+    <span class="n">XX</span><span class="p">,</span><span class="n">YY</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">grid_array</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span><span class="n">xmax</span><span class="p">,</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">,</span><span class="n">n_intervales</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">XX</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span><span class="n">YY</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span><span class="n">class_idx_to_plot</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figure_width</span><span class="p">,</span><span class="n">figure_height</span><span class="p">))</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">class_0_color</span><span class="p">,</span><span class="n">class_1_color</span><span class="p">])[[</span><span class="mi">1</span><span class="o">-</span><span class="n">class_idx_to_plot</span><span class="p">,</span><span class="n">class_idx_to_plot</span><span class="p">]]</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">cmap_from_color_a_to_b</span><span class="p">(</span>
+        <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">colors</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">mid_color</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1">#clev = np.arange(-0.5,0.5,.0001)</span>
+    <span class="k">if</span> <span class="n">colorbar_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colorbar_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Class </span><span class="si">{</span><span class="n">class_idx_to_plot</span><span class="si">}</span><span class="s2"> Probability&quot;</span>
+        
+    <span class="n">mu</span><span class="o">.</span><span class="n">plot_heatmap</span><span class="p">(</span>
+        <span class="n">XX</span><span class="p">,</span><span class="n">YY</span><span class="p">,</span><span class="n">Z</span><span class="p">,</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">,</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">,</span>
+
+        <span class="c1"># colorbar</span>
+        <span class="n">plot_colorbar</span> <span class="o">=</span> <span class="n">plot_colorbar</span><span class="p">,</span>
+        <span class="n">colorbar_label</span> <span class="o">=</span> <span class="n">colorbar_label</span><span class="p">,</span>
+        <span class="n">colorbar_labelpad</span> <span class="o">=</span> <span class="n">colorbar_labelpad</span><span class="p">,</span>
+        <span class="n">colorbar_label_fontsize</span> <span class="o">=</span> <span class="n">colorbar_label_fontsize</span><span class="p">,</span>
+        <span class="n">colorbar_tick_fontsize</span><span class="o">=</span><span class="n">colorbar_tick_fontsize</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>
+    
+    
+    
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+
+
+
+<span class="c1">#--- from machine_learning_tools ---</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">dimensionality_reduction_ml</span> <span class="k">as</span> <span class="n">dru</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">evaluation_metrics_utils</span> <span class="k">as</span> <span class="n">emu</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">matplotlib_ml</span> <span class="k">as</span> <span class="n">mu</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">numpy_ml</span> <span class="k">as</span> <span class="n">nu</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">pandas_ml</span> <span class="k">as</span> <span class="n">pdml</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">sklearn_models</span> <span class="k">as</span> <span class="n">sklm</span>
+
+<span class="n">plot_confusion_matrix</span> <span class="o">=</span> <span class="n">emu</span><span class="o">.</span><span class="n">plot_confusion_matrix</span>
+    
+
+<span class="c1">#--- from python_tools ---</span>
+<span class="kn">from</span> <span class="nn">python_tools</span> <span class="kn">import</span> <span class="n">matplotlib_utils</span> <span class="k">as</span> <span class="n">mu</span>
+<span class="kn">from</span> <span class="nn">python_tools</span> <span class="kn">import</span> <span class="n">numpy_utils</span> <span class="k">as</span> <span class="n">nu</span>
+<span class="kn">from</span> <span class="nn">python_tools</span> <span class="kn">import</span> <span class="n">pandas_utils</span> <span class="k">as</span> <span class="n">pu</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">visualizations_ml</span> <span class="k">as</span> <span class="n">vml</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
