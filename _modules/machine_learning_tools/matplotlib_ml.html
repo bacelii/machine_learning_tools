@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>machine_learning_tools.matplotlib_ml &mdash; machine-learning-tools  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            machine-learning-tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">machine_learning_tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">machine-learning-tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">machine_learning_tools.matplotlib_ml</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for machine_learning_tools.matplotlib_ml</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+
+
+
+<span class="sd">Notes on other functions: </span>
+<span class="sd">eventplot #will plot 1D data as lines, can stack multiple 1D events</span>
+<span class="sd">-- if did a lot of these gives the characteristic neuron spikes</span>
+<span class="sd">   all stacked on top of each other</span>
+
+
+<span class="sd">matplot colors can be described with </span>
+<span class="sd">&quot;C102&quot; where C{number} --&gt; there are only 10 possible colors</span>
+<span class="sd">but the number can go as high as you want it just repeats after 10</span>
+<span class="sd">Ex: C100  = C110</span>
+
+<span class="sd">#How to set the figure size:</span>
+<span class="sd">fig.set_size_inches(18.5, 10.5)</span>
+
+<span class="sd"># not have the subplots run into each other</span>
+<span class="sd">fig.tight_layout()</span>
+
+
+
+
+
+
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span> <span class="k">as</span> <span class="n">mcolors</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MaxNLocator</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">webcolors</span>
+
+
+<span class="n">graph_color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span><span class="s2">&quot;green&quot;</span><span class="p">,</span><span class="s2">&quot;red&quot;</span><span class="p">,</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span><span class="s2">&quot;magenta&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;black&quot;</span><span class="p">,</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span><span class="s2">&quot;midnightblue&quot;</span><span class="p">,</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span><span class="s2">&quot;crimson&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;orange&quot;</span><span class="p">,</span><span class="s2">&quot;olive&quot;</span><span class="p">,</span><span class="s2">&quot;sandybrown&quot;</span><span class="p">,</span><span class="s2">&quot;tan&quot;</span><span class="p">,</span><span class="s2">&quot;gold&quot;</span><span class="p">,</span><span class="s2">&quot;palegreen&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;darkslategray&quot;</span><span class="p">,</span><span class="s2">&quot;cadetblue&quot;</span><span class="p">,</span><span class="s2">&quot;brown&quot;</span><span class="p">,</span><span class="s2">&quot;forestgreen&quot;</span><span class="p">]</span>
+
+
+
+<div class="viewcode-block" id="generate_random_color"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.generate_random_color">[docs]</a><span class="k">def</span> <span class="nf">generate_random_color</span><span class="p">(</span><span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">colors_to_omit</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nu</span><span class="o">.</span><span class="n">is_array_like</span><span class="p">(</span><span class="n">colors_to_omit</span><span class="p">):</span>
+        <span class="n">colors_to_omit</span> <span class="o">=</span> <span class="p">[</span><span class="n">colors_to_omit</span><span class="p">]</span>
+    <span class="n">current_color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">graph_color_list</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">colors_to_omit</span><span class="p">]</span>
+    <span class="n">rand_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">current_color_list</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;random color chosen = </span><span class="si">{</span><span class="n">rand_color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">colors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">rand_color</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="generate_unique_random_color_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.generate_unique_random_color_list">[docs]</a><span class="k">def</span> <span class="nf">generate_unique_random_color_list</span><span class="p">(</span><span class="n">n_colors</span><span class="p">,</span><span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">colors_to_omit</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="n">total_colors</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_colors</span><span class="p">):</span>
+        <span class="n">found_color</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">found_color</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">nu</span><span class="o">.</span><span class="n">is_array_like</span><span class="p">(</span><span class="n">colors_to_omit</span><span class="p">):</span>
+                <span class="n">colors_to_omit</span> <span class="o">=</span> <span class="p">[</span><span class="n">colors_to_omit</span><span class="p">]</span>
+            <span class="n">current_color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">graph_color_list</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">colors_to_omit</span><span class="p">]</span>
+            <span class="n">rand_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">current_color_list</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rand_color</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">total_colors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;random color chosen = </span><span class="si">{</span><span class="n">rand_color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">total_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">rand_color</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">found_color</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">total_colors</span></div>
+        
+            
+<div class="viewcode-block" id="generate_non_randon_named_color_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.generate_non_randon_named_color_list">[docs]</a><span class="k">def</span> <span class="nf">generate_non_randon_named_color_list</span><span class="p">(</span><span class="n">n_colors</span><span class="p">,</span>
+                                        <span class="n">user_colors</span><span class="o">=</span><span class="p">[],</span> <span class="c1">#if user sends a prescribed list</span>
+                                        <span class="n">colors_to_omit</span><span class="o">=</span><span class="p">[],):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To generate a list of colors of a certain length </span>
+<span class="sd">    that is non-random</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n_colors</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">mu</span><span class="o">.</span><span class="n">generate_color_list</span><span class="p">(</span><span class="n">n_colors</span> <span class="o">=</span> <span class="n">n_colors</span><span class="p">,</span>
+                                  <span class="n">user_colors</span><span class="o">=</span><span class="n">user_colors</span><span class="p">,</span>
+                                  <span class="n">colors_to_omit</span><span class="o">=</span><span class="n">colors_to_omit</span><span class="p">,</span>
+                      <span class="n">return_named_colors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+<div class="viewcode-block" id="generate_color_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.generate_color_list">[docs]</a><span class="k">def</span> <span class="nf">generate_color_list</span><span class="p">(</span>
+                        <span class="n">user_colors</span><span class="o">=</span><span class="p">[],</span> <span class="c1">#if user sends a prescribed list</span>
+                        <span class="n">n_colors</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">colors_to_omit</span><span class="o">=</span><span class="p">[],</span>
+                        <span class="n">alpha_level</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                        <span class="n">return_named_colors</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Can specify the number of colors that you want</span>
+<span class="sd">    Can specify colors that you don&#39;t want</span>
+<span class="sd">    accept what alpha you want</span>
+<span class="sd">    </span>
+<span class="sd">    Example of how to use</span>
+<span class="sd">    colors_array = generate_color_list(colors_to_omit=[&quot;green&quot;])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#print(f&quot;user_colors = {user_colors}&quot;)</span>
+    <span class="c1"># if user_colors is defined then use that </span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">user_colors</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">current_color_list</span> <span class="o">=</span> <span class="n">user_colors</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">current_color_list</span> <span class="o">=</span> <span class="n">graph_color_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="c1">#remove any colors that shouldn&#39;t belong</span>
+    <span class="n">current_color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">current_color_list</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">colors_to_omit</span><span class="p">]</span>
+    
+    <span class="c1">#print(f&quot;current_color_list = {current_color_list}&quot;)</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_color_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">user_colors</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;one of the colors you specified was part of unallowed colors </span><span class="si">{</span><span class="n">colors_to_omit</span><span class="si">}</span><span class="s2">for a skeleton (because reserved for main)&quot;</span><span class="p">)</span>
+    
+    <span class="c1">#make a list as long as we need</span>
+    <span class="k">if</span> <span class="n">n_colors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">current_color_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_color_list</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_colors</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">current_color_list</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">))[:</span><span class="n">n_colors</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">return_named_colors</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">current_color_list</span>
+    
+    <span class="c1">#print(f&quot;current_color_list = {current_color_list}&quot;)</span>
+    <span class="c1">#now turn the color names all into rgb</span>
+    <span class="n">color_list_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">colors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">current_color_list</span><span class="p">])</span>
+    
+    <span class="c1">#changing the alpha level to the prescribed value</span>
+    <span class="n">color_list_rgb</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha_level</span>
+    
+    <span class="k">return</span> <span class="n">color_list_rgb</span></div>
+
+
+    
+<span class="c1">#----------------------------- Functions that were made for new graph visualization ------------------- #</span>
+
+<div class="viewcode-block" id="color_to_rgb"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.color_to_rgb">[docs]</a><span class="k">def</span> <span class="nf">color_to_rgb</span><span class="p">(</span><span class="n">color_str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To turn a string of a color into an RGB value</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: color_to_rgb(&quot;red&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">color_str</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">colors</span><span class="o">.</span><span class="n">to_rgb</span><span class="p">(</span><span class="n">color_str</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">color_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="color_to_rgba"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.color_to_rgba">[docs]</a><span class="k">def</span> <span class="nf">color_to_rgba</span><span class="p">(</span><span class="n">current_color</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+    <span class="n">curr_rgb</span> <span class="o">=</span> <span class="n">color_to_rgb</span><span class="p">(</span><span class="n">current_color</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">apply_alpha_to_color_list</span><span class="p">(</span><span class="n">curr_rgb</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="get_graph_color_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.get_graph_color_list">[docs]</a><span class="k">def</span> <span class="nf">get_graph_color_list</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">copy</span><span class="p">(</span><span class="n">graph_color_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="generate_random_rgba"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.generate_random_rgba">[docs]</a><span class="k">def</span> <span class="nf">generate_random_rgba</span><span class="p">(</span><span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">rand_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">graph_color_list</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;random color chosen = </span><span class="si">{</span><span class="n">rand_color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">colors</span><span class="o">.</span><span class="n">to_rgb</span><span class="p">(</span><span class="n">rand_color</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="generate_color_list_no_alpha_change"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.generate_color_list_no_alpha_change">[docs]</a><span class="k">def</span> <span class="nf">generate_color_list_no_alpha_change</span><span class="p">(</span>
+                        <span class="n">user_colors</span><span class="o">=</span><span class="p">[],</span> <span class="c1">#if user sends a prescribed list</span>
+                        <span class="n">n_colors</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">colors_to_omit</span><span class="o">=</span><span class="p">[],</span>
+                        <span class="n">alpha_level</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Can specify the number of colors that you want</span>
+<span class="sd">    Can specify colors that you don&#39;t want</span>
+<span class="sd">    accept what alpha you want</span>
+<span class="sd">    </span>
+<span class="sd">    Example of how to use</span>
+<span class="sd">    colors_array = generate_color_list(colors_to_omit=[&quot;green&quot;])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">user_colors</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">current_color_list</span> <span class="o">=</span> <span class="n">user_colors</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">current_color_list</span> <span class="o">=</span> <span class="n">graph_color_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors_to_omit</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">colors_to_omit_converted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">color_to_rgb</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">colors_to_omit</span><span class="p">])</span>
+        <span class="c1">#print(f&quot;colors_to_omit_converted = {colors_to_omit_converted}&quot;)</span>
+        <span class="n">colors_to_omit_converted</span> <span class="o">=</span> <span class="n">colors_to_omit_converted</span><span class="p">[:,:</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="c1">#remove any colors that shouldn&#39;t belong</span>
+        <span class="n">colors_to_omit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current_color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">current_color_list</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">matching_rows</span><span class="p">(</span><span class="n">colors_to_omit_converted</span><span class="p">,</span><span class="n">k</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+    
+    <span class="c1">#print(f&quot;current_color_list = {current_color_list}&quot;)</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_color_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No colors remaining in color list after colors_to_omit applied (</span><span class="si">{</span><span class="n">current_color_list</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    
+    <span class="c1">#make a list as long as we need</span>
+
+    <span class="n">current_color_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_color_list</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_colors</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">current_color_list</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">))[:</span><span class="n">n_colors</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">current_color_list</span></div>
+
+
+<div class="viewcode-block" id="process_non_dict_color_input"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.process_non_dict_color_input">[docs]</a><span class="k">def</span> <span class="nf">process_non_dict_color_input</span><span class="p">(</span><span class="n">color_input</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will return a color list that is as long as n_items</span>
+<span class="sd">    based on a diverse set of options for how to specify colors</span>
+<span class="sd">    </span>
+<span class="sd">    - string</span>
+<span class="sd">    - list of strings</span>
+<span class="sd">    - 1D np.array</span>
+<span class="sd">    - list of strings and 1D np.array</span>
+<span class="sd">    - list of 1D np.array or 2D np.array</span>
+<span class="sd">    </span>
+<span class="sd">    *Warning: This will not be alpha corrected*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">color_input</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span> <span class="c1">#if just string that says random</span>
+        <span class="n">graph_color_list</span> <span class="o">=</span> <span class="n">get_graph_color_list</span><span class="p">()</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_to_rgb</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">graph_color_list</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">color_input</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span> <span class="c1">#if just give a string then turn into list with string</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_to_rgb</span><span class="p">(</span><span class="n">color_input</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">color_input</span><span class="p">):</span> <span class="c1">#if just list of strings</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_to_rgb</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">color_input</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">is_array_like</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">color_input</span><span class="p">):</span> <span class="c1">#if there is an array in the list </span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_to_rgb</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span> <span class="k">else</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span>  <span class="n">color_input</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_input</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">color_list</span></div>
+
+<div class="viewcode-block" id="apply_alpha_to_color_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.apply_alpha_to_color_list">[docs]</a><span class="k">def</span> <span class="nf">apply_alpha_to_color_list</span><span class="p">(</span><span class="n">color_list</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span><span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">single_input</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nu</span><span class="o">.</span><span class="n">is_array_like</span><span class="p">(</span><span class="n">color_list</span><span class="p">):</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_list</span><span class="p">]</span>
+        <span class="n">single_input</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">color_list_alpha_fixed</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">color_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">color_list_alpha_fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">c</span><span class="p">,[</span><span class="n">alpha</span><span class="p">]]))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">color_list_alpha_fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found color that was not 3 or 4 length array in colors list: </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;color_list_alpha_fixed = </span><span class="si">{</span><span class="n">color_list_alpha_fixed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">single_input</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">color_list_alpha_fixed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">color_list_alpha_fixed</span></div>
+
+
+
+
+<div class="viewcode-block" id="closest_colour"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.closest_colour">[docs]</a><span class="k">def</span> <span class="nf">closest_colour</span><span class="p">(</span><span class="n">requested_colour</span><span class="p">):</span>
+    <span class="n">min_colours</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">webcolors</span><span class="o">.</span><span class="n">CSS3_HEX_TO_NAMES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">r_c</span><span class="p">,</span> <span class="n">g_c</span><span class="p">,</span> <span class="n">b_c</span> <span class="o">=</span> <span class="n">webcolors</span><span class="o">.</span><span class="n">hex_to_rgb</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">rd</span> <span class="o">=</span> <span class="p">(</span><span class="n">r_c</span> <span class="o">-</span> <span class="n">requested_colour</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">gd</span> <span class="o">=</span> <span class="p">(</span><span class="n">g_c</span> <span class="o">-</span> <span class="n">requested_colour</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">bd</span> <span class="o">=</span> <span class="p">(</span><span class="n">b_c</span> <span class="o">-</span> <span class="n">requested_colour</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">min_colours</span><span class="p">[(</span><span class="n">rd</span> <span class="o">+</span> <span class="n">gd</span> <span class="o">+</span> <span class="n">bd</span><span class="p">)]</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">return</span> <span class="n">min_colours</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">min_colours</span><span class="o">.</span><span class="n">keys</span><span class="p">())]</span></div>
+
+<div class="viewcode-block" id="get_colour_name"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.get_colour_name">[docs]</a><span class="k">def</span> <span class="nf">get_colour_name</span><span class="p">(</span><span class="n">requested_colour</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">closest_name</span> <span class="o">=</span> <span class="n">actual_name</span> <span class="o">=</span> <span class="n">webcolors</span><span class="o">.</span><span class="n">rgb_to_name</span><span class="p">(</span><span class="n">requested_colour</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">closest_name</span> <span class="o">=</span> <span class="n">closest_colour</span><span class="p">(</span><span class="n">requested_colour</span><span class="p">)</span>
+        <span class="n">actual_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">actual_name</span><span class="p">,</span> <span class="n">closest_name</span></div>
+
+<div class="viewcode-block" id="convert_rgb_to_name"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.convert_rgb_to_name">[docs]</a><span class="k">def</span> <span class="nf">convert_rgb_to_name</span><span class="p">(</span><span class="n">rgb_value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example: convert_rgb_to_name(np.array([[1,0,0,0.5]]))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rgb_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rgb_value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nu</span><span class="o">.</span><span class="n">is_array_like</span><span class="p">(</span><span class="n">rgb_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">rgb_value</span> <span class="o">=</span> <span class="n">rgb_value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1">#print(f&quot;rgb_value.shape = {rgb_value.shape}&quot;)</span>
+
+    <span class="n">output_colors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rgb_value</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">adjusted_color_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span>
+        <span class="n">output_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_colour_name</span><span class="p">(</span><span class="n">adjusted_color_value</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_colors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">output_colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_colors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">output_colors</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;len(output_colors) == 0&quot;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="convert_dict_rgb_values_to_names"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.convert_dict_rgb_values_to_names">[docs]</a><span class="k">def</span> <span class="nf">convert_dict_rgb_values_to_names</span><span class="p">(</span><span class="n">color_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To convert dictonary with colors as values to the color names</span>
+<span class="sd">    instead of the rgb equivalents</span>
+<span class="sd">    </span>
+<span class="sd">    Application: can be used on the color dictionary returned by the </span>
+<span class="sd">    neuron plotting function</span>
+<span class="sd">    </span>
+<span class="sd">    Example: </span>
+<span class="sd">    from python_tools import matplotlib_utils as mu</span>
+<span class="sd">    mu = reload(mu)</span>
+<span class="sd">    nviz=reload(nviz)</span>
+
+
+<span class="sd">    returned_color_dict = nviz.visualize_neuron(uncompressed_neuron,</span>
+<span class="sd">                                                visualize_type=[&quot;network&quot;],</span>
+<span class="sd">                                                network_resolution=&quot;branch&quot;,</span>
+<span class="sd">                                                network_directional=True,</span>
+<span class="sd">                                                network_soma=[&quot;S1&quot;,&quot;S0&quot;],</span>
+<span class="sd">                                                network_soma_color = [&quot;black&quot;,&quot;red&quot;],       </span>
+<span class="sd">                                                limb_branch_dict=dict(L1=&quot;all&quot;,</span>
+<span class="sd">                                                L2=&quot;all&quot;),</span>
+<span class="sd">                                                node_size = 1,</span>
+<span class="sd">                                                arrow_size = 1,</span>
+<span class="sd">                                                return_color_dict=True)</span>
+<span class="sd">                                                </span>
+<span class="sd">    color_info = mu.convert_dict_rgb_values_to_names(returned_color_dict)</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span><span class="n">convert_rgb_to_name</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">color_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span></div>
+    
+
+
+<span class="n">base_colors_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mcolors</span><span class="o">.</span><span class="n">BASE_COLORS</span><span class="p">,</span> <span class="o">**</span><span class="n">mcolors</span><span class="o">.</span><span class="n">CSS4_COLORS</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="plot_color_dict"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.plot_color_dict">[docs]</a><span class="k">def</span> <span class="nf">plot_color_dict</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="n">sorted_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                    <span class="n">hue_sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">ncols</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+                    <span class="n">figure_width</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+                    <span class="n">figure_height</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+                   <span class="n">print_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ex: </span>
+<span class="sd">    </span>
+<span class="sd">    #how to plot the base colors</span>
+<span class="sd">    Examples: </span>
+<span class="sd">    mu.plot_color_dict(mu.base_colors_dict,figure_height=20)</span>
+<span class="sd">    mu.plot_color_dict(mu.base_colors_dict,hue_sort=True,figure_height=20)</span>
+<span class="sd">    </span>
+<span class="sd">    How to plot colors returned from the plotting function:</span>
+<span class="sd">    from python_tools import matplotlib_utils as mu</span>
+<span class="sd">    mu = reload(mu)</span>
+<span class="sd">    nviz=reload(nviz)</span>
+
+
+<span class="sd">    returned_color_dict = nviz.visualize_neuron(uncompressed_neuron,</span>
+<span class="sd">                                                visualize_type=[&quot;network&quot;],</span>
+<span class="sd">                                                network_resolution=&quot;branch&quot;,</span>
+<span class="sd">                                                network_directional=True,</span>
+<span class="sd">                                                network_soma=[&quot;S1&quot;,&quot;S0&quot;],</span>
+<span class="sd">                                                network_soma_color = [&quot;black&quot;,&quot;red&quot;],       </span>
+<span class="sd">                                                limb_branch_dict=dict(L1=&quot;all&quot;,</span>
+<span class="sd">                                                L2=&quot;all&quot;),</span>
+<span class="sd">                                                node_size = 1,</span>
+<span class="sd">                                                arrow_size = 1,</span>
+<span class="sd">                                                return_color_dict=True)</span>
+<span class="sd">                                                </span>
+<span class="sd">    </span>
+<span class="sd">    mu.plot_color_dict(returned_color_dict,hue_sort=False,figure_height=20)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sorted_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">hue_sort</span><span class="p">:</span>
+            <span class="c1"># Sort colors by hue, saturation, value and then by name.</span>
+            <span class="n">by_hsv</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="nb">tuple</span><span class="p">(</span><span class="n">mcolors</span><span class="o">.</span><span class="n">rgb_to_hsv</span><span class="p">(</span><span class="n">mcolors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">color</span><span class="p">)[:</span><span class="mi">3</span><span class="p">])),</span> <span class="n">name</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">colors</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="c1">#getting the names of the </span>
+            <span class="n">sorted_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">hsv</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">by_hsv</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sorted_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_names</span><span class="p">)</span>
+     <span class="c1">#will always have 4 columns</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="n">n</span> <span class="o">//</span> <span class="n">ncols</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nrows = </span><span class="si">{</span><span class="n">nrows</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n-ncols*nrows = </span><span class="si">{</span><span class="n">n</span><span class="o">-</span><span class="n">ncols</span><span class="o">*</span><span class="n">nrows</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1">#creates figure</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figure_width</span><span class="p">,</span> <span class="n">figure_height</span><span class="p">))</span>
+
+    <span class="c1"># Get height and width</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_dpi</span><span class="p">()</span> <span class="o">*</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">/</span> <span class="p">(</span><span class="n">nrows</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">X</span> <span class="o">/</span> <span class="n">ncols</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_names</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="n">nrows</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="n">nrows</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">-</span> <span class="p">(</span><span class="n">row</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">-</span> <span class="n">h</span>
+
+        <span class="n">xi_line</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">col</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">xf_line</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">col</span> <span class="o">+</span> <span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">xi_text</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">col</span> <span class="o">+</span> <span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">xi_text</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">),</span>
+                <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">xi_line</span><span class="p">,</span> <span class="n">xf_line</span><span class="p">,</span>
+                  <span class="c1">#gets the color by name</span>
+                  <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">)</span>
+                 <span class="c1">#color=[1,0,0,1],linewidth=(h * 0.6)</span>
+                 <span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">top</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    
+    
+    
+<span class="c1"># -------------------- Generic Plotting functions --------------------</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Best Idea for concatenating plotting is to create the figure </span>
+<span class="sd">first and then to pass the figure to different functions</span>
+<span class="sd">and one of the subaxes will be altered within function</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="get_axes_locations_from_figure"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.get_axes_locations_from_figure">[docs]</a><span class="k">def</span> <span class="nf">get_axes_locations_from_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[[</span><span class="n">f</span><span class="o">.</span><span class="n">get_subplotspec</span><span class="p">()</span><span class="o">.</span><span class="n">colspan</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+             <span class="n">f</span><span class="o">.</span><span class="n">get_subplotspec</span><span class="p">()</span><span class="o">.</span><span class="n">rowspan</span><span class="o">.</span><span class="n">start</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_children</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]]</span></div>
+<div class="viewcode-block" id="get_axes_layout_from_figure"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.get_axes_layout_from_figure">[docs]</a><span class="k">def</span> <span class="nf">get_axes_layout_from_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">get_axes_locations_from_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span></div>
+
+<span class="c1"># plotting the BIC curve</span>
+<div class="viewcode-block" id="plot_graph"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.plot_graph">[docs]</a><span class="k">def</span> <span class="nf">plot_graph</span><span class="p">(</span><span class="n">title</span><span class="p">,</span>
+                <span class="n">y_values</span><span class="p">,</span>
+                <span class="n">x_values</span><span class="p">,</span>
+                <span class="n">x_axis_label</span><span class="p">,</span>
+                <span class="n">y_axis_label</span><span class="p">,</span>
+              <span class="n">return_fig</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">figure</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">ax_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">x_axis_int</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: For easy plotting and concatenating plots</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">figure</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">ax_index</span><span class="p">]</span>
+        <span class="n">return_fig</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_values</span><span class="p">,</span><span class="n">y_values</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">x_axis_label</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">y_axis_label</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        
+    <span class="k">if</span> <span class="n">x_axis_int</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">integer</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        
+    <span class="k">if</span> <span class="n">return_fig</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">figure</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="color_to_hex"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.color_to_hex">[docs]</a><span class="k">def</span> <span class="nf">color_to_hex</span><span class="p">(</span><span class="n">color</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">to_hex</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">keep_alpha</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="display_figure"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.display_figure">[docs]</a><span class="k">def</span> <span class="nf">display_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span></div>
+    
+<span class="c1"># ---------- Helping with graph functions for network -------- #</span>
+<div class="viewcode-block" id="bins_from_width_range"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.bins_from_width_range">[docs]</a><span class="k">def</span> <span class="nf">bins_from_width_range</span><span class="p">(</span><span class="n">bin_width</span><span class="p">,</span>
+                          <span class="n">bin_max</span><span class="p">,</span>
+                         <span class="n">bin_min</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To compute the width boundaries to help with </span>
+<span class="sd">    plotting and give a constant bin widht</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="c1">#     n_bins = (bin_max-bin_min)/bin_width</span>
+<span class="c1">#     bins = np.arange(int(bin_min/bin_width),n_bins+1)*bin_width</span>
+
+    <span class="k">if</span> <span class="n">bin_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bin_min</span> <span class="o">=</span> <span class="mi">0</span>
+        
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">bin_min</span><span class="p">,</span><span class="n">bin_max</span><span class="o">+</span><span class="mf">0.00001</span><span class="p">,</span><span class="n">bin_width</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="histogram"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.histogram">[docs]</a><span class="k">def</span> <span class="nf">histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+          <span class="n">n_bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+          <span class="n">bin_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">bin_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">bin_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">density</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">logscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+         <span class="n">return_fig_ax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">fontsize_axes</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ex: </span>
+<span class="sd">    histogram(in_degree,bin_max = 700,</span>
+<span class="sd">         bin_width = 20,return_fig_ax=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">bin_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">bin_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bin_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bin_min</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">bins</span><span class="o">=</span><span class="n">bins_from_width_range</span><span class="p">(</span><span class="n">bin_min</span> <span class="o">=</span><span class="n">bin_min</span><span class="p">,</span>
+                                   <span class="n">bin_max</span><span class="o">=</span><span class="n">bin_max</span><span class="p">,</span>
+                                   <span class="n">bin_width</span><span class="o">=</span><span class="n">bin_width</span><span class="p">)</span>
+        
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">+</span><span class="mf">0.001</span><span class="p">,</span>
+                       <span class="n">n_bins</span><span class="p">)</span>
+        
+    <span class="n">hist_heights</span><span class="p">,</span><span class="n">hist_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">hist_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#left edge</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">hist_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="c1">#right edge</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">hist_heights</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span> <span class="c1">#variable width, can set this as a scalar also</span>
+
+    <span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">)</span>
+
+        
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Degree&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize_axes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">density</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize_axes</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Density&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize_axes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">logscale</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">return_fig_ax</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+    
+<div class="viewcode-block" id="reset_default_settings"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.reset_default_settings">[docs]</a><span class="k">def</span> <span class="nf">reset_default_settings</span><span class="p">():</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParamsDefault</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="set_font_size"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.set_font_size">[docs]</a><span class="k">def</span> <span class="nf">set_font_size</span><span class="p">(</span><span class="n">font_size</span><span class="p">):</span>
+    
+    <span class="n">font</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;family&#39;</span> <span class="p">:</span> <span class="s1">&#39;normal&#39;</span><span class="p">,</span>
+        <span class="c1">#&#39;weight&#39; : &#39;bold&#39;,</span>
+        <span class="s1">&#39;size&#39;</span>   <span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+    
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">font</span><span class="p">)</span></div>
+    
+    
+<div class="viewcode-block" id="add_random_color_for_missing_labels_in_dict"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.add_random_color_for_missing_labels_in_dict">[docs]</a><span class="k">def</span> <span class="nf">add_random_color_for_missing_labels_in_dict</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span>
+                                                <span class="n">label_color_dict</span><span class="p">,</span>
+                                               <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will generate random colors for labels that</span>
+<span class="sd">    are missing in the labels dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unique_labels</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">))</span>
+    
+    <span class="n">curr_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">label_color_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">curr_colors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">label_color_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">labels_with_no_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">,</span><span class="n">curr_keys</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unique_labels = </span><span class="si">{</span><span class="n">unique_labels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;labels_with_no_color = </span><span class="si">{</span><span class="n">labels_with_no_color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="n">new_label_colors</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">generate_non_randon_named_color_list</span><span class="p">(</span>
+                                    <span class="n">n_colors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels_with_no_color</span><span class="p">),</span>
+                                    <span class="n">colors_to_omit</span><span class="o">=</span><span class="n">curr_colors</span><span class="p">)</span>
+    <span class="n">return_dict</span> <span class="o">=</span> <span class="n">label_color_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">lab</span><span class="p">,</span><span class="n">col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels_with_no_color</span><span class="p">,</span><span class="n">new_label_colors</span><span class="p">):</span>
+        <span class="n">return_dict</span><span class="p">[</span><span class="n">lab</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span>
+        
+    <span class="k">return</span> <span class="n">return_dict</span></div>
+
+<div class="viewcode-block" id="set_legend_outside_plot"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.set_legend_outside_plot">[docs]</a><span class="k">def</span> <span class="nf">set_legend_outside_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="n">scale_down</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will adjust your axis so that the legend appears outside of the box</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="n">box</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="n">scale_down</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">height</span><span class="p">])</span>
+
+    <span class="c1"># Put a legend to the right of the current axis</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+    
+<div class="viewcode-block" id="scatter_2D_with_labels"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.matplotlib_ml.scatter_2D_with_labels">[docs]</a><span class="k">def</span> <span class="nf">scatter_2D_with_labels</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">Y</span><span class="p">,</span>
+    <span class="n">labels</span><span class="p">,</span>
+    <span class="n">label_color_dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">y_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">axis_append</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">z_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">move_legend_outside_plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will plot scatter points</span>
+<span class="sd">    where each point has a unique label</span>
+<span class="sd">    (and allows to specify the colors of each label)</span>
+
+<span class="sd">    Pseudocode: </span>
+<span class="sd">    1) Find the unique labels</span>
+<span class="sd">    2) For all unique labels, if a color mapping is not </span>
+<span class="sd">    specified then add a random unique color (use function)</span>
+
+<span class="sd">    3) Iterate through the labels to plot: </span>
+<span class="sd">    a. Find all indices of that label</span>
+<span class="sd">    b. Plot them with the correct color and label</span>
+<span class="sd">    </span>
+<span class="sd">    4) Move the legend to outside of the plot</span>
+<span class="sd">    </span>
+<span class="sd">    mu.scatter_2D_with_labels(</span>
+<span class="sd">    X = np.concatenate([f1_inh,f1_exc]),</span>
+<span class="sd">    Y = np.concatenate([f2_inh,f2_exc]),</span>
+<span class="sd">    #Z = np.ones(194),</span>
+<span class="sd">    x_title = feature_1,</span>
+<span class="sd">    y_title = feature_2,</span>
+<span class="sd">    axis_append = &quot;(per um of skeleton)&quot;,</span>
+<span class="sd">    labels = np.concatenate([class_inh,class_exc]),</span>
+<span class="sd">    alpha = 0.5,</span>
+<span class="sd">    label_color_dict= dict(BC = &quot;blue&quot;,</span>
+<span class="sd">                        BPC = &quot;black&quot;,</span>
+<span class="sd">                        MC = &quot;yellow&quot;,</span>
+<span class="sd">                        excitatory = &quot;red&quot;</span>
+<span class="sd">                    ),</span>
+<span class="sd">    verbose = True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">Z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+        <span class="n">projection_type</span> <span class="o">=</span> <span class="s2">&quot;3d&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">projection_type</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">label_color_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">label_color_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        
+
+    <span class="n">labels</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span>
+    <span class="n">unique_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">color_dict_adj</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">add_random_color_for_missing_labels_in_dict</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span>
+                                               <span class="n">label_color_dict</span><span class="p">,</span>
+                                               <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1">#fig,ax = plt.subplots(1,1,projection_type=projection_type)</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span> <span class="o">=</span> <span class="n">projection_type</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">unique_labels</span><span class="p">:</span>
+        <span class="n">lab_mask</span> <span class="o">=</span> <span class="n">labels</span> <span class="o">==</span> <span class="n">lab</span>
+        <span class="n">X_curr</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">lab_mask</span><span class="p">]</span>
+        <span class="n">Y_curr</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">lab_mask</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">Z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Z_curr</span> <span class="o">=</span> <span class="n">Z</span><span class="p">[</span><span class="n">lab_mask</span><span class="p">]</span> 
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_curr</span><span class="p">,</span><span class="n">Y_curr</span><span class="p">,</span><span class="n">Z_curr</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">color_dict_adj</span><span class="p">[</span><span class="n">lab</span><span class="p">],</span>
+                   <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">,</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_curr</span><span class="p">,</span><span class="n">Y_curr</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">color_dict_adj</span><span class="p">[</span><span class="n">lab</span><span class="p">],</span>
+                   <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">,</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x_title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">axis_append</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y_title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">axis_append</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#ax.set_zlabel(f&quot;{z_title} {axis_append}&quot;)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">z_title</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">y_title</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">x_title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y_title</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">x_title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">move_legend_outside_plot</span><span class="p">:</span>
+        <span class="n">mu</span><span class="o">.</span><span class="n">set_legend_outside_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+    
+  
+    
+
+
+<span class="c1">#--- from machine_learning_tools ---</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">numpy_ml</span> <span class="k">as</span> <span class="n">nu</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">matplotlib_ml</span> <span class="k">as</span> <span class="n">mu</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

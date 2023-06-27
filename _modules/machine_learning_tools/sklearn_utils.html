@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>machine_learning_tools.sklearn_utils &mdash; machine-learning-tools  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            machine-learning-tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">machine_learning_tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">machine-learning-tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">machine_learning_tools.sklearn_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for machine_learning_tools.sklearn_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+
+
+
+<span class="sd">Important notes: </span>
+
+<span class="sd">sklearn.utils.Bunch: just an extended dictionary that allows attributes to referenced</span>
+<span class="sd">by  key, bunch[&quot;value_key&quot;], or by an attribute, bunch.value_key</span>
+
+
+<span class="sd">Notes: </span>
+<span class="sd">R^2 number: lm2.score(X, y)</span>
+
+
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_regression</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">log_loss</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span> 
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">tqdm.notebook</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span> <span class="nn">sklearn.datasets</span> <span class="k">as</span> <span class="nn">datasets</span>
+
+
+
+
+<div class="viewcode-block" id="dataset_df"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.dataset_df">[docs]</a><span class="k">def</span> <span class="nf">dataset_df</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span>
+              <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">target_name</span><span class="o">=</span><span class="s2">&quot;target&quot;</span><span class="p">,</span>
+              <span class="n">dropna</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">load_dataset_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;load_</span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load_dataset_func = </span><span class="si">{</span><span class="n">load_dataset_func</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1">#this actually returns an sklearn utils.Bunch</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">load_dataset_func</span><span class="p">()</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">curr_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">feature_names</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">target</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">curr_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;feature_names&quot;</span><span class="p">]</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> 
+        
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">curr_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">feature_names</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">target_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">targets</span>
+    
+    <span class="k">if</span> <span class="n">dropna</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="load_boston"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.load_boston">[docs]</a><span class="k">def</span> <span class="nf">load_boston</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MEDV: the median value of home prices</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">dataset_df</span><span class="p">(</span><span class="s2">&quot;boston&quot;</span><span class="p">,</span>
+              <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">target_name</span><span class="o">=</span><span class="s2">&quot;MEDV&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MSE"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.MSE">[docs]</a><span class="k">def</span> <span class="nf">MSE</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">X</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">clf</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will calculate the MSE of a model</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">clf</span>
+    <span class="k">if</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="logistic_log_loss"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.logistic_log_loss">[docs]</a><span class="k">def</span> <span class="nf">logistic_log_loss</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span><span class="n">X</span><span class="p">,</span><span class="n">y_true</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the Log loss, aka logistic loss or cross-entropy loss.</span>
+<span class="sd">    on a model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">log_loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="accuracy"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.accuracy">[docs]</a><span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the accuracy of a classifier</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="c1">#     try:</span>
+<span class="c1">#         X = X.to_numpy()</span>
+<span class="c1">#     except:</span>
+<span class="c1">#         pass</span>
+    
+<span class="c1">#     try:</span>
+<span class="c1">#         y = y.to_numpy()</span>
+<span class="c1">#     except:</span>
+<span class="c1">#         pass</span>
+    
+    
+    <span class="k">return</span> <span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="train_val_test_split"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.train_val_test_split">[docs]</a><span class="k">def</span> <span class="nf">train_val_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">val_size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">random_state</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1">#can pass int to get reproducable results</span>
+    <span class="n">return_dict</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To split the data into </span>
+<span class="sd">    1) train</span>
+<span class="sd">    2) validation (if requested)</span>
+<span class="sd">    3) test</span>
+
+<span class="sd">    Note: All percentages are specified as number 0 - 1</span>
+<span class="sd">    Process: </span>
+<span class="sd">    1) Split the data into test and train percentages</span>
+<span class="sd">    2) If validation is requested, split the train into train,val</span>
+<span class="sd">    by the following formula</span>
+
+<span class="sd">    val_perc/ ( 1 - test_perc)  =  val_perc_adjusted</span>
+<span class="sd"> </span>
+<span class="sd">    3) Return the different splits</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Example: </span>
+<span class="sd">    (X_train,</span>
+<span class="sd">     X_val,</span>
+<span class="sd">     X_test,</span>
+<span class="sd">     y_train,</span>
+<span class="sd">     y_val,</span>
+<span class="sd">     y_test) = sklu.train_val_test_split(</span>
+<span class="sd">        X,</span>
+<span class="sd">        y,</span>
+<span class="sd">        test_size = 0.2,</span>
+<span class="sd">        val_size = 0.2,</span>
+<span class="sd">        verbose = True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">train_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span>  <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                                            <span class="n">X</span><span class="p">,</span>
+                                            <span class="n">y</span><span class="p">,</span>
+                                            <span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span><span class="p">,</span>
+                                            <span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">val_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;For Train/Val/Test split of </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">&quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot; = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_dict</span><span class="p">:</span>
+            <span class="n">data_splits</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span>
+             <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span>
+             <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
+             <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">data_splits</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span>
+
+    
+    <span class="n">val_size_adj</span> <span class="o">=</span> <span class="n">val_size</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">test_size</span><span class="p">)</span>
+    
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span>  <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+                                            <span class="n">X_train</span><span class="p">,</span>
+                                            <span class="n">y_train</span><span class="p">,</span>
+                                            <span class="n">test_size</span> <span class="o">=</span> <span class="n">val_size_adj</span><span class="p">,</span>
+                                            <span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;For Train/Val/Test split of </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">val_size</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">&quot;</span>
+              <span class="sa">f</span><span class="s2">&quot; = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_val</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_dict</span><span class="p">:</span>
+        <span class="n">data_splits</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span>
+         <span class="n">X_val</span><span class="o">=</span><span class="n">X_val</span><span class="p">,</span>
+         <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span>
+         <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
+         <span class="n">y_val</span><span class="o">=</span><span class="n">y_val</span><span class="p">,</span>
+         <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_splits</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">X_train</span><span class="p">,</span><span class="n">X_val</span><span class="p">,</span><span class="n">X_test</span><span class="p">,</span><span class="n">y_train</span><span class="p">,</span><span class="n">y_val</span><span class="p">,</span><span class="n">y_test</span></div>
+
+
+<div class="viewcode-block" id="k_fold_df_split"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.k_fold_df_split">[docs]</a><span class="k">def</span> <span class="nf">k_fold_df_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">target_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_splits</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">random_state</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: </span>
+<span class="sd">    To divide a test and training dataframe</span>
+<span class="sd">    into multiple test/train dataframes to use for k fold cross validation</span>
+
+<span class="sd">    Ex: </span>
+<span class="sd">    n_splits = 5</span>
+<span class="sd">    fold_dfs = sklu.k_fold_df_split(</span>
+<span class="sd">        X_train_val,</span>
+<span class="sd">        y_train_val,</span>
+<span class="sd">        n_splits = n_splits)</span>
+
+<span class="sd">    fold_dfs[1][&quot;X_train&quot;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">pdml</span><span class="o">.</span><span class="n">X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">target_name</span><span class="p">)</span>
+
+    <span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">folds_test_train</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,(</span><span class="n">train_index</span><span class="p">,</span> <span class="n">test_index</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">)):</span>
+        <span class="c1">#print(&quot;TRAIN:&quot;, train_index, &quot;TEST:&quot;, test_index)</span>
+
+        <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">X_test_fold</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
+        <span class="n">y_train_fold</span><span class="p">,</span> <span class="n">y_test_fold</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
+
+        <span class="n">folds_test_train</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">X_train_fold</span><span class="p">,</span>
+                                  <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test_fold</span><span class="p">,</span>
+                                  <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train_fold</span><span class="p">,</span>
+                                  <span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test_fold</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">folds_test_train</span></div>
+
+<div class="viewcode-block" id="optimal_parameter_from_kfold_df"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.optimal_parameter_from_kfold_df">[docs]</a><span class="k">def</span> <span class="nf">optimal_parameter_from_kfold_df</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">parameter_name</span> <span class="o">=</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+    <span class="n">columns_prefix</span> <span class="o">=</span> <span class="s2">&quot;mse_fold&quot;</span><span class="p">,</span>
+    <span class="n">higher_param_higher_complexity</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_df</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">standard_error_buffer</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">plot_loss</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="c1">#mostly arguments for plotting</span>
+                                 <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will find the optimal parameter </span>
+<span class="sd">    based on a dataframe of the mse scores for different parameters</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    opt_k,ret_df = sklu.optimal_parameter_from_mse_df(</span>
+<span class="sd">    best_subset_df,</span>
+<span class="sd">    parameter_name = &quot;k&quot;,</span>
+<span class="sd">    columns_prefix = &quot;mse_fold&quot;,</span>
+<span class="sd">    higher_param_higher_complexity = True,</span>
+<span class="sd">    standard_error_buffer = True,</span>
+<span class="sd">    verbose = True,</span>
+<span class="sd">    return_df = True</span>
+<span class="sd">                                 )</span>
+<span class="sd">ret_df</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">best_subset_df</span><span class="o">=</span> <span class="n">df</span>
+    
+    <span class="n">mse_col</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">best_subset_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="p">(</span><span class="n">columns_prefix</span> <span class="ow">in</span> <span class="n">k</span><span class="p">)</span> <span class="ow">and</span> 
+          <span class="p">(</span><span class="s2">&quot;mean&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;std_dev&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;std_err&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span><span class="p">)]</span>
+    
+    <span class="n">mean_col</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">columns_prefix</span><span class="si">}</span><span class="s2">_mean&quot;</span>
+    <span class="n">std_error_col</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">columns_prefix</span><span class="si">}</span><span class="s2">_std_err&quot;</span>
+    
+    <span class="n">best_subset_df</span><span class="p">[</span><span class="n">mean_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_subset_df</span><span class="p">[</span><span class="n">mse_col</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#best_subset_df[f&quot;{columns_prefix}_std_dev&quot;] = best_subset_df[mse_col].std(axis=1)</span>
+    <span class="n">best_subset_df</span><span class="p">[</span><span class="n">std_error_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_subset_df</span><span class="p">[</span><span class="n">mse_col</span><span class="p">]</span><span class="o">.</span><span class="n">sem</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="n">curr_data</span> <span class="o">=</span> <span class="n">best_subset_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mean_col</span><span class="si">}</span><span class="s2"> == </span><span class="si">{</span><span class="n">best_subset_df</span><span class="p">[</span><span class="n">mean_col</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                                    <span class="p">)[[</span><span class="n">mean_col</span><span class="p">,</span><span class="n">std_error_col</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    
+    <span class="n">mean_opt</span><span class="p">,</span> <span class="n">std_err_opt</span><span class="o">=</span>  <span class="n">curr_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">standard_error_buffer</span><span class="p">:</span>
+        <span class="n">std_err_opt</span> <span class="o">=</span> <span class="mi">0</span>
+        
+    <span class="k">if</span> <span class="n">higher_param_higher_complexity</span><span class="p">:</span>
+        <span class="n">optimal_k</span> <span class="o">=</span> <span class="n">best_subset_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mean_col</span><span class="si">}</span><span class="s2"> &lt;= </span><span class="si">{</span><span class="n">mean_opt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">std_err_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)[</span><span class="n">parameter_name</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">optimal_k</span> <span class="o">=</span> <span class="n">best_subset_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mean_col</span><span class="si">}</span><span class="s2"> &lt;= </span><span class="si">{</span><span class="n">mean_opt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">std_err_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)[</span><span class="n">parameter_name</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mean_opt= </span><span class="si">{</span><span class="n">mean_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;std_err_opt = </span><span class="si">{</span><span class="n">std_err_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">columns_prefix</span><span class="si">}</span><span class="s2"> cutoff = </span><span class="si">{</span><span class="n">mean_opt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">std_err_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;optimal_</span><span class="si">{</span><span class="n">parameter_name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">optimal_k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    
+    <span class="k">if</span> <span class="n">plot_loss</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">machine_learning_tools</span> <span class="kn">import</span> <span class="n">pandas_ml</span> <span class="k">as</span> <span class="n">pdml</span>
+        <span class="n">pdml</span><span class="o">.</span><span class="n">plot_df_x_y_with_std_err</span><span class="p">(</span>
+        <span class="n">best_subset_df</span><span class="p">,</span>
+        <span class="n">x_column</span><span class="o">=</span> <span class="n">parameter_name</span><span class="p">,</span>
+        <span class="n">y_column</span> <span class="o">=</span> <span class="n">mean_col</span><span class="p">,</span>
+        <span class="n">std_err_column</span> <span class="o">=</span> <span class="n">std_error_col</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">return_df</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">optimal_k</span><span class="p">,</span><span class="n">best_subset_df</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">optimal_k</span></div>
+
+    
+    
+<div class="viewcode-block" id="random_regression_with_informative_features"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.random_regression_with_informative_features">[docs]</a><span class="k">def</span> <span class="nf">random_regression_with_informative_features</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="mi">306</span><span class="p">,</span>
+    <span class="n">n_features</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span>
+    <span class="n">n_informative</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>   
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+    <span class="n">noise</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">return_true_coef</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: will create a random regression</span>
+<span class="sd">    with a certain number of informative features</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">coef</span> <span class="o">=</span> <span class="n">make_regression</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span>
+                                 <span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> 
+                                 <span class="n">n_informative</span><span class="o">=</span><span class="n">n_informative</span><span class="p">,</span>
+                                <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span>
+                                 <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">coef</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+
+    <span class="n">X</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">X</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># scale features</span>
+    <span class="k">if</span> <span class="n">return_true_coef</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">coef</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">y</span></div>
+    
+<div class="viewcode-block" id="CV_optimal_param_1D"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.CV_optimal_param_1D">[docs]</a><span class="k">def</span> <span class="nf">CV_optimal_param_1D</span><span class="p">(</span>
+    <span class="n">parameter_options</span><span class="p">,</span>
+    <span class="n">clf_function</span><span class="p">,</span>
+    
+    <span class="c1">#arguments for loss function</span>
+    <span class="n">loss_function</span><span class="p">,</span>
+    
+    <span class="c1">#cross validation parameters</span>
+    <span class="n">n_splits</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    
+    <span class="c1"># parameters for splits</span>
+    <span class="n">data_splits</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">test_size</span> <span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">val_size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+
+    <span class="c1">#parameters for the type of classifier</span>
+    
+    <span class="n">clf_parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="p">),</span>
+
+    
+    
+    
+    <span class="c1">#arguments for the determination of the optimal parameter</span>
+    <span class="n">standard_error_buffer</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot_loss</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    
+    <span class="c1">#arguments for return</span>
+    <span class="n">return_data_splits</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To Run Cross Validation by Hand with Specific</span>
+<span class="sd">    - Dataset</span>
+<span class="sd">    - Model Type</span>
+<span class="sd">    - 1D Parameter Grid to Search over</span>
+<span class="sd">    - Loss function to measure</span>
+<span class="sd">    - Method of evaluating the best loss function</span>
+
+<span class="sd">    Pseudocode: </span>
+<span class="sd">    0) Define the parameter space to iterate over</span>
+<span class="sd">    1) Split the Data into,test,training and validation</span>
+<span class="sd">    2) Combine the validation and training datasets</span>
+<span class="sd">    in order to do cross validation</span>
+<span class="sd">    3) Compute the datasets for each cross validation </span>
+
+<span class="sd">    For every parameter option:</span>
+<span class="sd">        For every K fold dataset:</span>
+<span class="sd">            Train the model on the dataset</span>
+<span class="sd">            Measure the MSE or another loss for that model</span>
+<span class="sd">            Store the certain loss</span>
+<span class="sd">        Find the average loss and the standard error on the loss</span>
+
+<span class="sd">    Pick the optimal parameter by one of the options:</span>
+<span class="sd">    a) Picking the parameter with the lowest average loss</span>
+<span class="sd">    b) Picking the parameter value that is the least complex model</span>
+<span class="sd">     that is within one standard deviation of the parameter with the</span>
+<span class="sd">     minimum average loss</span>
+<span class="sd">     </span>
+<span class="sd">     Example: </span>
+<span class="sd">     clf,data_splits = sklu.CV_optimal_param_1D(</span>
+<span class="sd">        parameter_options = dict(C = np.array([10.**(k) for k in np.linspace(-4,3,25)])),</span>
+
+<span class="sd">        X = X,</span>
+<span class="sd">        y = y,</span>
+
+<span class="sd">        #parameters for the type of classifier</span>
+<span class="sd">        clf_function = linear_model.LogisticRegression,</span>
+<span class="sd">        clf_parameters = dict(</span>
+<span class="sd">            penalty = &quot;l1&quot;,</span>
+<span class="sd">             solver=&quot;saga&quot;,</span>
+<span class="sd">             max_iter=10000, ),</span>
+
+<span class="sd">        #arguments for loss function</span>
+<span class="sd">        loss_function = sklu.logistic_log_loss,</span>
+
+<span class="sd">        #arguments for the determination of the optimal parameter</span>
+<span class="sd">        standard_error_buffer = True,</span>
+<span class="sd">        plot_loss = True,</span>
+
+
+<span class="sd">        #arguments for return</span>
+<span class="sd">        return_data_splits = True,</span>
+
+<span class="sd">        verbose = True,</span>
+<span class="sd">        )</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">data_splits</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;X and y must be set if data_splits is None&quot;</span><span class="p">)</span>
+        
+        <span class="p">(</span><span class="n">X_train</span><span class="p">,</span>
+         <span class="n">X_val</span><span class="p">,</span>
+         <span class="n">X_test</span><span class="p">,</span>
+         <span class="n">y_train</span><span class="p">,</span>
+         <span class="n">y_val</span><span class="p">,</span>
+         <span class="n">y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">sklu</span><span class="o">.</span><span class="n">train_val_test_split</span><span class="p">(</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span><span class="p">,</span>
+            <span class="n">val_size</span> <span class="o">=</span> <span class="n">val_size</span><span class="p">,</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">)</span>
+
+        <span class="n">data_splits</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span>
+         <span class="n">X_val</span><span class="o">=</span><span class="n">X_val</span><span class="p">,</span>
+         <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span>
+         <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
+         <span class="n">y_val</span><span class="o">=</span><span class="n">y_val</span><span class="p">,</span>
+         <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;X_val&quot;</span> <span class="ow">in</span> <span class="n">data_splits</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;X_train&quot;</span><span class="p">]</span>
+        <span class="n">X_val</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;X_val&quot;</span><span class="p">]</span>
+        <span class="n">X_test</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;X_test&quot;</span><span class="p">]</span>
+
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;y_train&quot;</span><span class="p">]</span>
+        <span class="n">y_val</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;y_val&quot;</span><span class="p">]</span>
+        <span class="n">y_test</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;y_test&quot;</span><span class="p">]</span>
+
+        <span class="n">X_train_val</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X_train</span><span class="p">,</span><span class="n">X_val</span><span class="p">])</span>
+        <span class="n">y_train_val</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">y_train</span><span class="p">,</span><span class="n">y_val</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">X_train_val</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;X_train&quot;</span><span class="p">]</span>
+        <span class="n">X_test</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;X_test&quot;</span><span class="p">]</span>
+
+        <span class="n">y_train_val</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;y_train&quot;</span><span class="p">]</span>
+        <span class="n">y_test</span> <span class="o">=</span> <span class="n">data_splits</span><span class="p">[</span><span class="s2">&quot;y_test&quot;</span><span class="p">]</span>
+
+
+    <span class="n">fold_dfs</span> <span class="o">=</span> <span class="n">sklu</span><span class="o">.</span><span class="n">k_fold_df_split</span><span class="p">(</span>
+        <span class="n">X_train_val</span><span class="p">,</span>
+        <span class="n">y_train_val</span><span class="p">,</span>
+        <span class="n">n_splits</span> <span class="o">=</span> <span class="n">n_splits</span><span class="p">)</span>
+
+    <span class="n">cv_dicts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span><span class="n">C_options</span> <span class="ow">in</span> <span class="n">parameter_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">C_options</span><span class="p">):</span>
+            <span class="n">curr_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">param_name</span><span class="p">:</span><span class="n">c</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">fold_idx</span><span class="p">,</span><span class="n">fold_data</span> <span class="ow">in</span> <span class="n">fold_dfs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+                <span class="c1">#setting classifier type</span>
+                <span class="n">p_dict</span> <span class="o">=</span> <span class="n">clf_parameters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">p_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">param_name</span><span class="p">:</span><span class="n">c</span><span class="p">})</span>
+                <span class="n">clf</span> <span class="o">=</span> <span class="n">clf_function</span><span class="p">(</span><span class="o">**</span><span class="n">p_dict</span><span class="p">)</span>
+
+                <span class="c1">#training the classifier</span>
+                <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">fold_data</span><span class="p">[</span><span class="s2">&quot;X_train&quot;</span><span class="p">],</span>
+                       <span class="n">fold_data</span><span class="p">[</span><span class="s2">&quot;y_train&quot;</span><span class="p">])</span>
+
+                <span class="c1">#computes the loss for the classifier</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="p">,</span>
+                                    <span class="n">X</span> <span class="o">=</span> <span class="n">fold_data</span><span class="p">[</span><span class="s2">&quot;X_test&quot;</span><span class="p">],</span>
+                                    <span class="n">y_true</span> <span class="o">=</span> <span class="n">fold_data</span><span class="p">[</span><span class="s2">&quot;y_test&quot;</span><span class="p">],)</span>
+
+                <span class="n">curr_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">loss_function</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">_fold_</span><span class="si">{</span><span class="n">fold_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loss</span>
+
+
+            <span class="n">cv_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_dict</span><span class="p">)</span>
+
+    <span class="c1"># compiles the results</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">cv_dicts</span><span class="p">)</span>
+
+
+
+    <span class="c1"># best parameter using the 1 Standard Error Trick</span>
+    <span class="n">opt_C</span><span class="p">,</span> <span class="n">kfold_stat_df</span> <span class="o">=</span> <span class="n">sklu</span><span class="o">.</span><span class="n">optimal_parameter_from_kfold_df</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">parameter_name</span> <span class="o">=</span> <span class="n">param_name</span><span class="p">,</span>
+        <span class="n">columns_prefix</span> <span class="o">=</span> <span class="n">loss_function</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="n">return_df</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">standard_error_buffer</span> <span class="o">=</span> <span class="n">standard_error_buffer</span><span class="p">,</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">,</span>
+        <span class="n">plot_loss</span> <span class="o">=</span> <span class="n">plot_loss</span><span class="p">,</span>
+
+    <span class="p">)</span>
+
+    <span class="c1"># train the final model on the optimal parameter:</span>
+    <span class="n">p_dict</span> <span class="o">=</span> <span class="n">clf_parameters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">p_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">param_name</span><span class="p">:</span><span class="n">opt_C</span><span class="p">})</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">clf_function</span><span class="p">(</span><span class="o">**</span><span class="n">p_dict</span><span class="p">)</span>
+    <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_val</span><span class="p">,</span><span class="n">y_train_val</span><span class="p">)</span>
+
+    <span class="c1"># print the statistics of the optimal parameter</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Cross Validation Statistics&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">clf</span><span class="si">}</span><span class="s2"> Hand optimal C = </span><span class="si">{</span><span class="n">opt_C</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">hand_opt_loss_val</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">clf</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span><span class="n">X</span><span class="o">=</span><span class="n">X_train_val</span><span class="p">,</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_train_val</span><span class="p">)</span>
+        <span class="n">hand_opt_loss_test</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">clf</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span><span class="n">X</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hand_opt_loss_val= </span><span class="si">{</span><span class="n">hand_opt_loss_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;hand_opt_loss_test= </span><span class="si">{</span><span class="n">hand_opt_loss_test</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_data_splits</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clf</span><span class="p">,</span><span class="n">data_splits</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clf</span></div>
+
+
+<div class="viewcode-block" id="accuracy_score"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.sklearn_utils.accuracy_score">[docs]</a><span class="k">def</span> <span class="nf">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">sklearn_utils</span> <span class="k">as</span> <span class="n">sklu</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

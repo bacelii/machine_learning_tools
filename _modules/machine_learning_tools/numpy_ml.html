@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>machine_learning_tools.numpy_ml &mdash; machine-learning-tools  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            machine-learning-tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">machine_learning_tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">machine-learning-tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">machine_learning_tools.numpy_ml</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for machine_learning_tools.numpy_ml</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span><span class="n">squareform</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span> 
+<span class="kn">import</span> <span class="nn">trimesh</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Notes on functionality: </span>
+<span class="sd">np.concatenate: combines list of lists into one list like itertools does</span>
+<span class="sd">np.ptp: gives range from maximum-minimum</span>
+
+<span class="sd">np.diff #gets the differences between subsequent elements (turns n element --&gt; n-1 elements)</span>
+
+<span class="sd">np.insert(array,indexes of where you want insertion,what you want inserted before the places you specified) --&gt; can do multiple insertions: </span>
+
+<span class="sd">Ex: </span>
+<span class="sd">x = np.array([1,4,5,10])</span>
+<span class="sd">np.insert(x,slice(0,5),2)</span>
+<span class="sd">&gt;&gt; output: array([ 2,  1,  2,  4,  2,  5,  2, 10])</span>
+
+
+<span class="sd">If want to find the indexes of what is common between 2 1D arrray use</span>
+<span class="sd">same_ids,x_ind,y_ind = np.intersect1d(soma_segment_id,connectivity_ids,return_indices=True)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="compare_threshold"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.compare_threshold">[docs]</a><span class="k">def</span> <span class="nf">compare_threshold</span><span class="p">(</span><span class="n">item1</span><span class="p">,</span><span class="n">item2</span><span class="p">,</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span><span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Function that will take a scalar or 2D array and subtract them</span>
+<span class="sd">    if the distance between them is less than the specified threshold</span>
+<span class="sd">    then consider equal</span>
+<span class="sd">    </span>
+<span class="sd">    Example: </span>
+<span class="sd">    nu = reload(nu)</span>
+
+<span class="sd">    item1 = [[1,4,5,7],</span>
+<span class="sd">             [1,4,5,7],</span>
+<span class="sd">             [1,4,5,7]]</span>
+<span class="sd">    item2 = [[1,4,5,8.00001],</span>
+<span class="sd">            [1,4,5,7.00001],</span>
+<span class="sd">            [1,4,5,7.00001]]</span>
+
+<span class="sd">    # item1 = [1,4,5,7]</span>
+<span class="sd">    # item2 = [1,4,5,9.0000001]</span>
+
+<span class="sd">    print(nu.compare_threshold(item1,item2,print_flag=True))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">item1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item1</span><span class="p">)</span>
+    <span class="n">item2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">item1</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="n">item2</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension for item1.ndim (</span><span class="si">{</span><span class="n">item1</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">) does not equal item2.ndim (</span><span class="si">{</span><span class="n">item2</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">item1</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">item2</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;compare_threshold does not handle items with greater than 2 dimensions: item1.ndim (</span><span class="si">{</span><span class="n">item1</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">), item2.ndim (</span><span class="si">{</span><span class="n">item2</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">) &quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">item1</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">item1</span><span class="o">-</span><span class="n">item2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">item1</span> <span class="o">-</span> <span class="n">item2</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;difference = </span><span class="si">{</span><span class="n">difference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="c1">#compare against threshold and return result</span>
+    <span class="k">return</span> <span class="n">difference</span> <span class="o">&lt;=</span> <span class="n">threshold</span></div>
+
+<div class="viewcode-block" id="concatenate_lists"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.concatenate_lists">[docs]</a><span class="k">def</span> <span class="nf">concatenate_lists</span><span class="p">(</span><span class="n">list_of_lists</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">list_of_lists</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="is_array_like"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.is_array_like">[docs]</a><span class="k">def</span> <span class="nf">is_array_like</span><span class="p">(</span><span class="n">current_data</span><span class="p">,</span><span class="n">include_tuple</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">types_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">([])),</span><span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])),</span><span class="nb">list</span><span class="p">,</span><span class="n">trimesh</span><span class="o">.</span><span class="n">caching</span><span class="o">.</span><span class="n">TrackedArray</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">include_tuple</span><span class="p">:</span>
+        <span class="n">types_to_check</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">current_data</span><span class="p">)</span> <span class="ow">in</span> <span class="n">types_to_check</span></div>
+
+<div class="viewcode-block" id="non_empty_or_none"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.non_empty_or_none">[docs]</a><span class="k">def</span> <span class="nf">non_empty_or_none</span><span class="p">(</span><span class="n">current_data</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">current_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="array_after_exclusion"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.array_after_exclusion">[docs]</a><span class="k">def</span> <span class="nf">array_after_exclusion</span><span class="p">(</span>
+                        <span class="n">original_array</span><span class="o">=</span><span class="p">[],</span>                    
+                        <span class="n">exclusion_list</span><span class="o">=</span><span class="p">[],</span>
+                        <span class="n">n_elements</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To efficiently get the difference between 2 lists:</span>
+<span class="sd">    </span>
+<span class="sd">    original_list = [1,5,6,10,11]</span>
+<span class="sd">    exclusion = [10,6]</span>
+<span class="sd">    n_elements = 20</span>
+
+<span class="sd">    array_after_exclusion(n_elements=n_elements,exclusion_list=exclusion)</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    ** pretty much the same thing as : </span>
+<span class="sd">    np.setdiff1d(array1, array2)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exclusion_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="n">original_array</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_array</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">n_elements</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">original_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_elements</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Exceptino</span><span class="p">(</span><span class="s2">&quot;No original array passed&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">original_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">original_array</span><span class="p">)</span>
+            
+    <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">original_array</span><span class="p">,</span><span class="n">exclusion_list</span><span class="p">)</span>
+    <span class="c1">#print(f&quot;mask = {mask}&quot;)</span>
+    <span class="k">return</span> <span class="n">original_array</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="load_dict"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.load_dict">[docs]</a><span class="k">def</span> <span class="nf">load_dict</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">file_path</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">Path</span><span class="p">()):</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+      
+    <span class="n">my_dict</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">my_dict</span><span class="p">[</span><span class="n">my_dict</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]][()]</span></div>
+
+<div class="viewcode-block" id="get_coordinate_distance_matrix"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.get_coordinate_distance_matrix">[docs]</a><span class="k">def</span> <span class="nf">get_coordinate_distance_matrix</span><span class="p">(</span><span class="n">coordinates</span><span class="p">):</span>
+    <span class="n">distance_matrix_condensed</span> <span class="o">=</span> <span class="n">pdist</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    <span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">squareform</span><span class="p">(</span><span class="n">distance_matrix_condensed</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">distance_matrix</span></div>
+
+<div class="viewcode-block" id="get_matching_vertices"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.get_matching_vertices">[docs]</a><span class="k">def</span> <span class="nf">get_matching_vertices</span><span class="p">(</span><span class="n">possible_vertices</span><span class="p">,</span><span class="n">ignore_diagonal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">equiv_distance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ignore_diagonal is not implemented yet </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">possible_vertices</span> <span class="o">=</span> <span class="n">possible_vertices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+    
+    <span class="n">dist_matrix</span> <span class="o">=</span> <span class="n">get_coordinate_distance_matrix</span><span class="p">(</span><span class="n">possible_vertices</span><span class="p">)</span>
+    
+    <span class="n">dist_matrix_copy</span> <span class="o">=</span> <span class="n">dist_matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">dist_matrix_copy</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dist_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The smallest distance (not including diagonal) = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dist_matrix_copy</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="n">matching_vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist_matrix</span> <span class="o">&lt;=</span> <span class="n">equiv_distance</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">if</span> <span class="n">ignore_diagonal</span><span class="p">:</span>
+        <span class="n">left_side</span> <span class="o">=</span> <span class="n">matching_vertices</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">right_side</span> <span class="o">=</span> <span class="n">matching_vertices</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">matching_vertices</span><span class="p">[</span><span class="n">left_side</span> <span class="o">!=</span> <span class="n">right_side</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">matching_vertices</span>
+        
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="number_matching_vertices_between_lists"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.number_matching_vertices_between_lists">[docs]</a><span class="k">def</span> <span class="nf">number_matching_vertices_between_lists</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">stacked_vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
+    <span class="n">stacked_vertices_unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">stacked_vertices</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">n_different</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stacked_vertices</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">stacked_vertices_unique</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n_different</span></div>
+
+<div class="viewcode-block" id="test_matching_vertices_in_lists"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.test_matching_vertices_in_lists">[docs]</a><span class="k">def</span> <span class="nf">test_matching_vertices_in_lists</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">n_different</span> <span class="o">=</span> <span class="n">number_matching_vertices_between_lists</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of matching vertices = </span><span class="si">{</span><span class="n">n_different</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_different</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">n_different</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;More vertices in unique list&quot;</span><span class="p">)</span></div>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">How can find pairwise distance:</span>
+
+<span class="sd">example_skeleton = current_mesh_data[0][&quot;branch_skeletons&quot;][0]</span>
+<span class="sd">ex_skeleton = example_skeleton.reshape(-1,3)</span>
+
+
+<span class="sd">#sk.convert_skeleton_to_graph(ex_skeleton)</span>
+
+<span class="sd">start_time = time.time()</span>
+<span class="sd">distance_matrix = pdist(ex_skeleton,&#39;euclidean&#39;)</span>
+<span class="sd">print(f&quot;Total time for pdist = {time.time() - start_time}&quot;)</span>
+
+<span class="sd">returns a matrix that is a lower triangular matrix of size n*(n-1)/2</span>
+<span class="sd">that gives the distance</span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="find_matching_endpoints_row"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.find_matching_endpoints_row">[docs]</a><span class="k">def</span> <span class="nf">find_matching_endpoints_row</span><span class="p">(</span><span class="n">branch_idx_to_endpoints</span><span class="p">,</span><span class="n">end_coordinates</span><span class="p">):</span>
+    <span class="n">match_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">branch_idx_to_endpoints</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="n">end_coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">match_2</span> <span class="o">=</span> <span class="p">(</span><span class="n">branch_idx_to_endpoints</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="n">end_coordinates</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">match_1</span> <span class="o">+</span> <span class="n">match_2</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="matching_rows_old"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.matching_rows_old">[docs]</a><span class="k">def</span> <span class="nf">matching_rows_old</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span><span class="n">row</span><span class="p">,</span><span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vals = </span><span class="si">{</span><span class="n">vals</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;row = </span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">row</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="matching_rows"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.matching_rows">[docs]</a><span class="k">def</span> <span class="nf">matching_rows</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span><span class="n">row</span><span class="p">,</span>
+                      <span class="n">print_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">equiv_distance</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">print_flag</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vals = </span><span class="si">{</span><span class="n">vals</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;row = </span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vals</span><span class="o">-</span><span class="n">row</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">&lt;</span><span class="n">equiv_distance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="matching_row_index"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.matching_row_index">[docs]</a><span class="k">def</span> <span class="nf">matching_row_index</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span><span class="n">row</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">matching_rows</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span><span class="n">row</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<span class="c1"># ----------- made when developing the neuron class ------------- #</span>
+<div class="viewcode-block" id="sort_multidim_array_by_rows"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.sort_multidim_array_by_rows">[docs]</a><span class="k">def</span> <span class="nf">sort_multidim_array_by_rows</span><span class="p">(</span><span class="n">edge_array</span><span class="p">,</span><span class="n">order_row_items</span><span class="o">=</span><span class="kc">False</span><span class="p">,):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To sort an array along the 0 axis where you maintain the row integrity</span>
+<span class="sd">    (with possibly sorting the individual elements along a row)</span>
+<span class="sd">    </span>
+<span class="sd">    Example: On how to get sorted edges</span>
+<span class="sd">    from python_tools import numpy_utils as nu</span>
+<span class="sd">    nu = reload(nu)</span>
+<span class="sd">    nu.sort_multidim_array_by_rows(limb_concept_network.edges(),order_row_items=True)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#print(f&#39;edge_array = {edge_array} with type = {type(edge_array)}&#39;)</span>
+    
+    <span class="c1">#make sure it is an array</span>
+    <span class="n">edge_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">edge_array</span><span class="p">)</span>
+    
+    <span class="c1">#check that multidimensional</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">edge_array</span><span class="o">.</span><span class="n">shape</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;edge_array = </span><span class="si">{</span><span class="n">edge_array</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;array passed did not have at least 2 dimensions&quot;</span><span class="p">)</span>
+        
+    <span class="c1">#will rearrange the items to be in a row if not care about the order here</span>
+    <span class="k">if</span> <span class="n">order_row_items</span><span class="p">:</span>
+        <span class="n">edge_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">edge_array</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1">#sort by the x and then y of the egde</span>
+    <span class="k">def</span> <span class="nf">sorting_func</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">edge_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span>
+
+    <span class="c1">#sorted_edge_array = np.array(sorted(edge_array , key=lambda k: [k[0], k[1]]))</span>
+    <span class="n">sorted_edge_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">edge_array</span> <span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">sorting_func</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">sorted_edge_array</span></div>
+
+
+
+<div class="viewcode-block" id="sort_elements_in_every_row"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.sort_elements_in_every_row">[docs]</a><span class="k">def</span> <span class="nf">sort_elements_in_every_row</span><span class="p">(</span><span class="n">current_array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">yi</span><span class="p">)</span> <span class="k">for</span> <span class="n">yi</span> <span class="ow">in</span> <span class="n">current_array</span><span class="p">])</span></div>
+<span class="c1"># --------- Functions pulled from trimesh.grouping ---------- #</span>
+
+<div class="viewcode-block" id="sort_rows_by_column"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.sort_rows_by_column">[docs]</a><span class="k">def</span> <span class="nf">sort_rows_by_column</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">column_idx</span><span class="p">,</span><span class="n">largest_to_smallest</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will sort the rows based on the values of 1 column</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">array</span><span class="p">[:,</span><span class="n">column_idx</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">largest_to_smallest</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array</span><span class="p">[</span><span class="n">order</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="function_over_multi_lists"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.function_over_multi_lists">[docs]</a><span class="k">def</span> <span class="nf">function_over_multi_lists</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span><span class="n">set_function</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="n">set_function</span><span class="p">,</span><span class="n">arrays</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="setdiff1d_multi_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.setdiff1d_multi_list">[docs]</a><span class="k">def</span> <span class="nf">setdiff1d_multi_list</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">function_over_multi_lists</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="intersect1d_multi_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.intersect1d_multi_list">[docs]</a><span class="k">def</span> <span class="nf">intersect1d_multi_list</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">function_over_multi_lists</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="intersect2d_multi_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.intersect2d_multi_list">[docs]</a><span class="k">def</span> <span class="nf">intersect2d_multi_list</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">function_over_multi_lists</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span><span class="n">nu</span><span class="o">.</span><span class="n">intersect2d</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="union1d_multi_list"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.union1d_multi_list">[docs]</a><span class="k">def</span> <span class="nf">union1d_multi_list</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">function_over_multi_lists</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">union1d</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="intersect1d"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.intersect1d">[docs]</a><span class="k">def</span> <span class="nf">intersect1d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">,</span><span class="n">assume_unique</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">return_indices</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will return the common elements from 2 possibly different sized arrays</span>
+<span class="sd">    </span>
+<span class="sd">    If select the return indices = True,</span>
+<span class="sd">    will also return the indexes of the common elements</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">,</span>
+                         <span class="n">assume_unique</span><span class="o">=</span><span class="n">assume_unique</span><span class="p">,</span>
+                         <span class="n">return_indices</span><span class="o">=</span><span class="n">return_indices</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="setdiff1d"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.setdiff1d">[docs]</a><span class="k">def</span> <span class="nf">setdiff1d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">,</span><span class="n">assume_unique</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To get the elements in arr1 that aren&#39;t in arr2</span>
+<span class="sd">    and then to possibly return the indices of those that were</span>
+<span class="sd">    unique in the first array</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">arr1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr1</span><span class="p">)</span>
+    <span class="n">leftout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">,</span><span class="n">assume_unique</span><span class="o">=</span><span class="n">assume_unique</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">arr_1_indices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">leftout</span><span class="p">,</span><span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">arr_1_indices_sorted</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">arr_1_indices</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_indices</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arr1</span><span class="p">[</span><span class="n">arr_1_indices_sorted</span><span class="p">],</span><span class="n">arr_1_indices_sorted</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arr1</span><span class="p">[</span><span class="n">arr_1_indices_sorted</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="setdiff2d"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.setdiff2d">[docs]</a><span class="k">def</span> <span class="nf">setdiff2d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">arr1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">matching_rows</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span><span class="n">k</span><span class="p">))</span><span class="o">==</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">arr1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">matching_rows_old</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span><span class="n">k</span><span class="p">))</span><span class="o">==</span><span class="mi">0</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="intersect2d"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.intersect2d">[docs]</a><span class="k">def</span> <span class="nf">intersect2d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">arr1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">matching_rows</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span><span class="n">k</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">arr1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">matching_rows_old</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span><span class="n">k</span><span class="p">))</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="divide_into_label_indexes"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.divide_into_label_indexes">[docs]</a><span class="k">def</span> <span class="nf">divide_into_label_indexes</span><span class="p">(</span><span class="n">mapping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To take an array that attributes labels to indices</span>
+<span class="sd">    and divide it into a list of the arrays that correspond to the indices of</span>
+<span class="sd">    all of the labels</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unique_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">mapping</span><span class="p">))</span>
+    <span class="n">final_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mapping</span><span class="o">==</span><span class="n">lab</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">unique_labels</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">final_list</span></div>
+
+<div class="viewcode-block" id="turn_off_scientific_notation"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.turn_off_scientific_notation">[docs]</a><span class="k">def</span> <span class="nf">turn_off_scientific_notation</span><span class="p">():</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="average_by_weights"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.average_by_weights">[docs]</a><span class="k">def</span> <span class="nf">average_by_weights</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="n">weights</span><span class="p">):</span>
+    <span class="n">weights_normalized</span> <span class="o">=</span> <span class="n">weights</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">values</span><span class="o">*</span><span class="n">weights_normalized</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="angle_between_vectors"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.angle_between_vectors">[docs]</a><span class="k">def</span> <span class="nf">angle_between_vectors</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">acute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    vec1 = np.array([0,0,1])</span>
+<span class="sd">    vec2 = np.array([1,1,-0.1])</span>
+<span class="sd">    angle(vec1,vec2,verbose=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dot_product</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dot_product = </span><span class="si">{</span><span class="n">dot_product</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dot_product</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v2</span><span class="p">)))</span>
+    
+    <span class="k">if</span> <span class="n">acute</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">rad_angle</span> <span class="o">=</span>  <span class="n">angle</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rad_angle</span> <span class="o">=</span>  <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">angle</span>
+        
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="mi">180</span><span class="o">*</span> <span class="n">rad_angle</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rad_angle</span>
+            
+    
+    <span class="k">return</span> <span class="n">return_angle</span></div>
+
+
+<div class="viewcode-block" id="intersecting_array_components"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.intersecting_array_components">[docs]</a><span class="k">def</span> <span class="nf">intersecting_array_components</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span><span class="n">sort_components</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">perfect_match</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: </span>
+<span class="sd">    Will find the groups of arrays that are</span>
+<span class="sd">    connected components based on overlap of elements</span>
+<span class="sd">    </span>
+<span class="sd">    Pseudocode: </span>
+<span class="sd">    1) Create an empty edges list</span>
+<span class="sd">    2) Iterate through all combinations of arrays (skipping the redundants)</span>
+<span class="sd">    a. heck if there is an intersection</span>
+<span class="sd">    b. If yes then add to edges list</span>
+<span class="sd">    3) Trun the edges into a graph </span>
+<span class="sd">    4) Return the connected components</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">array_edges</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">arr1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">arr2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">j</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">perfect_match</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr2</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                <span class="n">intersect_elem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">intersect1d</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">perfect_match</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersect_elem</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr1</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersect_elem</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;for edge </span><span class="si">{</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">, # matching element = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">intersect_elem</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">array_edges</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span>
+                    
+                    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;array_edges = </span><span class="si">{</span><span class="n">array_edges</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+    <span class="n">G</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arrays</span><span class="p">)))</span>
+    <span class="n">G</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">array_edges</span><span class="p">)</span>
+    
+    <span class="n">conn_comps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">)])</span>
+    
+    <span class="k">if</span> <span class="n">sort_components</span><span class="p">:</span>
+        <span class="n">conn_comps_lenghts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">conn_comps</span><span class="p">]</span>
+        <span class="n">conn_comps_ordered</span> <span class="o">=</span> <span class="p">[</span><span class="n">conn_comps</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">conn_comps_lenghts</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returning ordered connected components, original lens = </span><span class="si">{</span><span class="n">conn_comps_lenghts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">conn_comps</span> <span class="o">=</span>  <span class="n">conn_comps_ordered</span>
+    
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">conn_comps</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">array_split</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">n_groups</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">n_groups</span><span class="p">)</span>
+
+<div class="viewcode-block" id="unique_rows"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.unique_rows">[docs]</a><span class="k">def</span> <span class="nf">unique_rows</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="unique_non_self_pairings"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.unique_non_self_pairings">[docs]</a><span class="k">def</span> <span class="nf">unique_non_self_pairings</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will take a list of pairings and </span>
+<span class="sd">    then filter the list to only unique pairings where ther is no self</span>
+<span class="sd">    pairing</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="mi">0</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    
+    <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">array</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">array</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">array</span></div>
+
+
+<div class="viewcode-block" id="choose_k_combinations"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.choose_k_combinations">[docs]</a><span class="k">def</span> <span class="nf">choose_k_combinations</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">k</span><span class="p">))</span></div>
+<div class="viewcode-block" id="all_unique_choose_2_combinations"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.all_unique_choose_2_combinations">[docs]</a><span class="k">def</span> <span class="nf">all_unique_choose_2_combinations</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a list of numbers  or labels, will </span>
+<span class="sd">    determine all the possible unique pariings</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">starting_node_combinations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">nu</span><span class="o">.</span><span class="n">unique_non_self_pairings</span><span class="p">(</span><span class="n">starting_node_combinations</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="all_unique_choose_k_combinations"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.all_unique_choose_k_combinations">[docs]</a><span class="k">def</span> <span class="nf">all_unique_choose_k_combinations</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">k</span><span class="p">):</span>
+    <span class="n">starting_node_combinations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">nu</span><span class="o">.</span><span class="n">unique_non_self_pairings</span><span class="p">(</span><span class="n">starting_node_combinations</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="unique_pairings_between_2_arrays"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.unique_pairings_between_2_arrays">[docs]</a><span class="k">def</span> <span class="nf">unique_pairings_between_2_arrays</span><span class="p">(</span><span class="n">array1</span><span class="p">,</span><span class="n">array2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Turns 2 seperate array into all possible comibnations of elements</span>
+<span class="sd">    </span>
+<span class="sd">    [1,2], [3,4]</span>
+<span class="sd">    </span>
+<span class="sd">    into </span>
+<span class="sd">    </span>
+<span class="sd">    array([[1, 3],</span>
+<span class="sd">       [1, 4],</span>
+<span class="sd">       [2, 3],</span>
+<span class="sd">       [2, 4]])</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">array1</span><span class="p">,</span> <span class="n">array2</span><span class="p">))</span>
+    <span class="n">combinations</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">combinations</span></div>
+
+
+
+<div class="viewcode-block" id="remove_indexes"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.remove_indexes">[docs]</a><span class="k">def</span> <span class="nf">remove_indexes</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span><span class="n">arr2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="mode_1d"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.mode_1d">[docs]</a><span class="k">def</span> <span class="nf">mode_1d</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="n">array</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="all_subarrays"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.all_subarrays">[docs]</a><span class="k">def</span> <span class="nf">all_subarrays</span> <span class="p">(</span><span class="n">l</span><span class="p">):</span> 
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ex: </span>
+<span class="sd">    from python_tools import numpy_utils as nu</span>
+<span class="sd">    nu.all_subarrays([[1,&quot;a&quot;],[2,&quot;b&quot;],[3,&quot;c&quot;]])</span>
+<span class="sd">    </span>
+<span class="sd">    Output:</span>
+<span class="sd">    [[],</span>
+<span class="sd">     [[1, &#39;a&#39;]],</span>
+<span class="sd">     [[2, &#39;b&#39;]],</span>
+<span class="sd">     [[1, &#39;a&#39;], [2, &#39;b&#39;]],</span>
+<span class="sd">     [[3, &#39;c&#39;]],</span>
+<span class="sd">     [[1, &#39;a&#39;], [3, &#39;c&#39;]],</span>
+<span class="sd">     [[2, &#39;b&#39;], [3, &#39;c&#39;]],</span>
+<span class="sd">     [[1, &#39;a&#39;], [2, &#39;b&#39;], [3, &#39;c&#39;]]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="p">[]</span>   
+    <span class="n">lists</span> <span class="o">=</span> <span class="p">[</span><span class="n">base</span><span class="p">]</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)):</span> 
+        <span class="n">orig</span> <span class="o">=</span> <span class="n">lists</span><span class="p">[:]</span> 
+        <span class="n">new</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> 
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lists</span><span class="p">)):</span> 
+            <span class="n">lists</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lists</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">new</span><span class="p">]</span> 
+        <span class="n">lists</span> <span class="o">=</span> <span class="n">orig</span> <span class="o">+</span> <span class="n">lists</span> 
+
+    <span class="k">return</span> <span class="n">lists</span></div>
+
+<div class="viewcode-block" id="random_2D_subarray"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.random_2D_subarray">[docs]</a><span class="k">def</span> <span class="nf">random_2D_subarray</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">n_samples</span><span class="p">,</span>
+                      <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To chose a random number of rows from</span>
+<span class="sd">    a 2D array</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    from python_tools import numpy_utils as nu</span>
+<span class="sd">    import numpy as np</span>
+
+<span class="sd">    y = np.array([[1,3],[3,2],[5,6]])</span>
+<span class="sd">    nu.random_2D_subarray(array=y,</span>
+<span class="sd">                      n_samples=2,</span>
+<span class="sd">                      replace=False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sampling </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> rows from array of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="si">}</span><span class="s2"> with replacement = </span><span class="si">{</span><span class="n">replace</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">random_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)),</span><span class="n">size</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array</span><span class="p">[</span><span class="n">random_indexes</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="comma_str"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.comma_str">[docs]</a><span class="k">def</span> <span class="nf">comma_str</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="array_split"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.array_split">[docs]</a><span class="k">def</span> <span class="nf">array_split</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">n_splits</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split an array into multiple sub-arrays</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    from python_tools import numpy_utils as nu</span>
+<span class="sd">    nu.array_split(np.arange(0,10),3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">n_splits</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="repeat_vector_down_rows"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.repeat_vector_down_rows">[docs]</a><span class="k">def</span> <span class="nf">repeat_vector_down_rows</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">n_repeat</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ex: Turn [705895.1025, 711348.065 , 761467.87  ]</span>
+<span class="sd">        into: </span>
+<span class="sd">    </span>
+<span class="sd">    TrackedArray([[705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ],</span>
+<span class="sd">              [705895.1025, 711348.065 , 761467.87  ]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">n_repeat</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="all_partitions"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.all_partitions">[docs]</a><span class="k">def</span> <span class="nf">all_partitions</span><span class="p">(</span><span class="n">array</span><span class="p">,</span>
+    <span class="n">min_partition_size</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will form all of the possible</span>
+<span class="sd">    2 partions of an array</span>
+<span class="sd">    where you can specify the minimum</span>
+<span class="sd">    number of elements needed </span>
+<span class="sd">    for each possible partition</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    x = nu.all_partitions(array = np.array([4,5,6,9]))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">choose_k_options</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">min_partition_size</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mf">0.01</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;choose_k_options = </span><span class="si">{</span><span class="n">choose_k_options</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+    <span class="n">all_partitions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">choose_k_options</span><span class="p">:</span>
+        
+        <span class="n">part_1</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">choose_k_combinations</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">part_2</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">p1</span><span class="p">)</span> <span class="k">for</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">part_1</span><span class="p">]</span>
+        <span class="n">paired_partitions</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">list</span><span class="p">(</span><span class="n">u</span><span class="p">),</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">part_1</span><span class="p">,</span><span class="n">part_2</span><span class="p">)]</span>
+
+        
+        
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">-</span><span class="n">k</span><span class="p">:</span>
+            <span class="n">paired_partitions</span> <span class="o">=</span> <span class="n">paired_partitions</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paired_partitions</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="c1">#print(f&quot;part_1 = {part_1}&quot;)</span>
+            <span class="c1">#print(f&quot;part_2 = {part_2}&quot;)</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">pp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">paired_partitions</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;partition </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">pp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+        <span class="n">all_partitions</span> <span class="o">+=</span> <span class="n">paired_partitions</span>
+
+    <span class="k">return</span> <span class="n">all_partitions</span></div>
+
+<div class="viewcode-block" id="float_to_datetime"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.float_to_datetime">[docs]</a><span class="k">def</span> <span class="nf">float_to_datetime</span><span class="p">(</span><span class="n">fl</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">fl</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="obj_array_to_dtype_array"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.obj_array_to_dtype_array">[docs]</a><span class="k">def</span> <span class="nf">obj_array_to_dtype_array</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">array</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="save_compressed"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.save_compressed">[docs]</a><span class="k">def</span> <span class="nf">save_compressed</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span><span class="n">data</span> <span class="o">=</span> <span class="n">array</span><span class="p">)</span></div>
+<div class="viewcode-block" id="load_compressed"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.load_compressed">[docs]</a><span class="k">def</span> <span class="nf">load_compressed</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filepath</span><span class="p">)[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span></div>
+
+
+<span class="c1"># ---------- 6/7: Used for synapse filtering -------- #</span>
+<div class="viewcode-block" id="indices_of_comparison_func"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.indices_of_comparison_func">[docs]</a><span class="k">def</span> <span class="nf">indices_of_comparison_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span><span class="n">array1</span><span class="p">,</span><span class="n">array2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the indices of the elements that result</span>
+<span class="sd">    from applying func to array1 and array2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">array1</span><span class="p">,</span> <span class="n">array2</span><span class="p">))</span></div>
+<div class="viewcode-block" id="intersect_indices"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.intersect_indices">[docs]</a><span class="k">def</span> <span class="nf">intersect_indices</span><span class="p">(</span><span class="n">array1</span><span class="p">,</span><span class="n">array2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the indices of the intersection of array1 and 2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">indices_of_comparison_func</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">,</span><span class="n">array1</span><span class="p">,</span><span class="n">array2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="polyval"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.polyval">[docs]</a><span class="k">def</span> <span class="nf">polyval</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="polyfit"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.polyfit">[docs]</a><span class="k">def</span> <span class="nf">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">degree</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">degree</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="weighted_average"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.weighted_average">[docs]</a><span class="k">def</span> <span class="nf">weighted_average</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">weights</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ex: </span>
+<span class="sd">    from python_tools import numpy_utils as nu</span>
+<span class="sd">    nu.weighted_average(d_widths,d_sk_lengths)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="argnan"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.argnan">[docs]</a><span class="k">def</span> <span class="nf">argnan</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="vector_from_endpoints"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.vector_from_endpoints">[docs]</a><span class="k">def</span> <span class="nf">vector_from_endpoints</span><span class="p">(</span><span class="n">start_endpoint</span><span class="p">,</span><span class="n">end_endpoint</span><span class="p">,</span><span class="n">normalize_vector</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">end_endpoint</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">start_endpoint</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">normalize_vector</span><span class="p">:</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="n">vector</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vector</span></div>
+
+<div class="viewcode-block" id="convert_to_array_like"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.convert_to_array_like">[docs]</a><span class="k">def</span> <span class="nf">convert_to_array_like</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">include_tuple</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will convert something to an array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nu</span><span class="o">.</span><span class="n">is_array_like</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">include_tuple</span><span class="o">=</span><span class="n">include_tuple</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">array</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">array</span></div>
+
+<div class="viewcode-block" id="original_array_indices_of_elements"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.original_array_indices_of_elements">[docs]</a><span class="k">def</span> <span class="nf">original_array_indices_of_elements</span><span class="p">(</span><span class="n">original_array</span><span class="p">,</span>
+                                      <span class="n">matching_array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will find the indices of the matching array</span>
+<span class="sd">    from the original array</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    x = [1,2,3,4,5,6]</span>
+<span class="sd">    y = [4,6,2]</span>
+<span class="sd">    nu.original_array_indices_of_elements(x,y)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">original_array</span><span class="p">,</span>
+                           <span class="n">matching_array</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="order_arrays_using_original_and_matching"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.order_arrays_using_original_and_matching">[docs]</a><span class="k">def</span> <span class="nf">order_arrays_using_original_and_matching</span><span class="p">(</span><span class="n">original_array</span><span class="p">,</span>
+                                            <span class="n">matching_array</span><span class="p">,</span>
+                                            <span class="n">arrays</span><span class="p">,</span>
+                                            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To rearrange arrays so that </span>
+<span class="sd">    a specific array matches an original array</span>
+
+<span class="sd">    Pseudocode: </span>
+<span class="sd">    1) Find the matching array elements</span>
+<span class="sd">    2) For each array in arrays index using the matching indices</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    x = [1,2,3,4,5,6]</span>
+<span class="sd">    y = [4,6,2]</span>
+<span class="sd">    arrays  = [ np.array([ &quot;hi&quot;,&quot;yes&quot;,&quot;but&quot;])]</span>
+<span class="sd">    arrays  = [ np.array([ &quot;hi&quot;,&quot;yes&quot;,&quot;but&quot;]), [&quot;no&quot;,&quot;yes&quot;,&quot;hi&quot;]]</span>
+<span class="sd">    arrays  = [ np.array([ 1,2,3]), [7,8,9]]</span>
+<span class="sd">    </span>
+
+<span class="sd">    order_arrays_using_original_and_matching(original_array = x,</span>
+<span class="sd">    matching_array = y,</span>
+<span class="sd">    arrays=arrays,</span>
+<span class="sd">    verbose = True)</span>
+<span class="sd">    </span>
+<span class="sd">    Return: </span>
+<span class="sd">    &gt;&gt;[array([&#39;but&#39;, &#39;hi&#39;, &#39;yes&#39;], dtype=&#39;&lt;U3&#39;)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mapping_indices</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">original_array_indices_of_elements</span><span class="p">(</span><span class="n">original_array</span><span class="p">,</span>
+                                          <span class="n">matching_array</span><span class="p">)</span>
+    <span class="n">sorted_mapping_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">mapping_indices</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mapping_indices = </span><span class="si">{</span><span class="n">mapping_indices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sorted_mapping_indices = </span><span class="si">{</span><span class="n">sorted_mapping_indices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">reordered_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">k</span><span class="p">)[</span><span class="n">sorted_mapping_indices</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">]</span>
+    <span class="n">reordered_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">z</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span><span class="n">reordered_arrays</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;reordered_arrays = </span><span class="si">{</span><span class="n">reordered_arrays</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">reordered_arrays</span></div>
+
+<div class="viewcode-block" id="order_array_using_original_and_matching"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.order_array_using_original_and_matching">[docs]</a><span class="k">def</span> <span class="nf">order_array_using_original_and_matching</span><span class="p">(</span><span class="n">original_array</span><span class="p">,</span>
+                                            <span class="n">matching_array</span><span class="p">,</span>
+                                            <span class="n">array</span><span class="p">,</span>
+                                            <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To rearrange arrays so that </span>
+<span class="sd">    a specific array matches an original array</span>
+
+<span class="sd">    Pseudocode: </span>
+<span class="sd">    1) Find the matching array elements</span>
+<span class="sd">    2) For each array in arrays index using the matching indices</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    x = [1,2,3,4,5,6]</span>
+<span class="sd">    y = [4,6,2]</span>
+<span class="sd">    arrays  = [ np.array([ &quot;hi&quot;,&quot;yes&quot;,&quot;but&quot;])]</span>
+<span class="sd">    arrays  = [ np.array([ &quot;hi&quot;,&quot;yes&quot;,&quot;but&quot;]), [&quot;no&quot;,&quot;yes&quot;,&quot;hi&quot;]]</span>
+<span class="sd">    arrays  = [ np.array([ 1,2,3]), [7,8,9]]</span>
+<span class="sd">    </span>
+
+<span class="sd">    order_arrays_using_original_and_matching(original_array = x,</span>
+<span class="sd">    matching_array = y,</span>
+<span class="sd">    arrays=arrays,</span>
+<span class="sd">    verbose = True)</span>
+<span class="sd">    </span>
+<span class="sd">    Return: </span>
+<span class="sd">    &gt;&gt;[array([&#39;but&#39;, &#39;hi&#39;, &#39;yes&#39;], dtype=&#39;&lt;U3&#39;)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mapping_indices</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">original_array_indices_of_elements</span><span class="p">(</span><span class="n">original_array</span><span class="p">,</span>
+                                          <span class="n">matching_array</span><span class="p">)</span>
+    <span class="n">sorted_mapping_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">mapping_indices</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mapping_indices = </span><span class="si">{</span><span class="n">mapping_indices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sorted_mapping_indices = </span><span class="si">{</span><span class="n">sorted_mapping_indices</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">reordered_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)[</span><span class="n">sorted_mapping_indices</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">reordered_array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reordered_array</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;reordered_array = </span><span class="si">{</span><span class="n">reordered_array</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">reordered_array</span></div>
+
+<div class="viewcode-block" id="divide_data_into_classes"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.divide_data_into_classes">[docs]</a><span class="k">def</span> <span class="nf">divide_data_into_classes</span><span class="p">(</span><span class="n">classes_array</span><span class="p">,</span><span class="n">data_array</span><span class="p">,</span><span class="n">unique_classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will divide two parallel arrays of class and the data</span>
+<span class="sd">    into a dictionary that keys to the unique class and hen </span>
+<span class="sd">    all of the data that belongs to that class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_array</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">unique_classes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">unique_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">classes_array</span><span class="p">)</span>
+    
+    <span class="n">return_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">unique_classes</span><span class="p">:</span>
+        <span class="n">return_dict</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_array</span><span class="p">[</span><span class="n">classes_array</span> <span class="o">==</span> <span class="n">c</span><span class="p">]</span>
+        
+    <span class="k">return</span> <span class="n">return_dict</span></div>
+
+<div class="viewcode-block" id="concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D">[docs]</a><span class="k">def</span> <span class="nf">concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example: </span>
+<span class="sd">    from python_tools import numpy_utils as nu</span>
+<span class="sd">    arrays = [np.array([1,2,3]), np.array([4,5,6])]</span>
+<span class="sd">    nu.concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D(arrays)</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt; output:</span>
+<span class="sd">    array([[1, 4],</span>
+<span class="sd">       [2, 5],</span>
+<span class="sd">       [3, 6]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">arrays</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="min_max"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.min_max">[docs]</a><span class="k">def</span> <span class="nf">min_max</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
+<div class="viewcode-block" id="min_max_3D_coordinates"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.min_max_3D_coordinates">[docs]</a><span class="k">def</span> <span class="nf">min_max_3D_coordinates</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">min_max</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="bouning_box_corners"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.bouning_box_corners">[docs]</a><span class="k">def</span> <span class="nf">bouning_box_corners</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">min_max_3D_coordinates</span><span class="p">(</span><span class="n">array</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bouning_box_midpoint"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.bouning_box_midpoint">[docs]</a><span class="k">def</span> <span class="nf">bouning_box_midpoint</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">bouning_box_corners</span><span class="p">(</span><span class="n">array</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bounding_box_side_lengths"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.bounding_box_side_lengths">[docs]</a><span class="k">def</span> <span class="nf">bounding_box_side_lengths</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="n">min_max</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">min_max</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">min_max</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">min_max</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="bounding_box_volume"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.bounding_box_volume">[docs]</a><span class="k">def</span> <span class="nf">bounding_box_volume</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">nu</span><span class="o">.</span><span class="n">bounding_box_side_lengths</span><span class="p">(</span><span class="n">array</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="argsort_multidim_array_by_rows"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.argsort_multidim_array_by_rows">[docs]</a><span class="k">def</span> <span class="nf">argsort_multidim_array_by_rows</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">descending</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ex: </span>
+<span class="sd">    x = np.array([</span>
+<span class="sd">        [2,2,3,4,5],</span>
+<span class="sd">        [-2,2,3,4,5],</span>
+<span class="sd">        [3,1,1,1,1],</span>
+<span class="sd">        [1,10,10,10,10],</span>
+<span class="sd">        [3,0,1,1,1],</span>
+<span class="sd">        [-2,-3,3,4,5]</span>
+<span class="sd">         ])</span>
+<span class="sd">         </span>
+<span class="sd">    #showing this argsort will correctly sort</span>
+<span class="sd">    x[nu.argsort_multidim_arrays_by_rows(x)]</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt; Output: </span>
+<span class="sd">    </span>
+<span class="sd">    array([[-2, -3,  3,  4,  5],</span>
+<span class="sd">       [-2,  2,  3,  4,  5],</span>
+<span class="sd">       [ 1, 10, 10, 10, 10],</span>
+<span class="sd">       [ 2,  2,  3,  4,  5],</span>
+<span class="sd">       [ 3,  0,  1,  1,  1],</span>
+<span class="sd">       [ 3,  1,  1,  1,  1]])</span>
+<span class="sd">         </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unique_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">argsort_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">nu</span><span class="o">.</span><span class="n">matching_rows_old</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">unique_array</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">descending</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">argsort_index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">argsort_index</span></div>
+
+<div class="viewcode-block" id="matrix_of_row_idx"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.matrix_of_row_idx">[docs]</a><span class="k">def</span> <span class="nf">matrix_of_row_idx</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span><span class="n">n_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n_cols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_cols</span> <span class="o">=</span> <span class="n">n_rows</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n_rows</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_rows</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">n_cols</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="matrix_of_col_idx"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.matrix_of_col_idx">[docs]</a><span class="k">def</span> <span class="nf">matrix_of_col_idx</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span><span class="n">n_cols</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">matrix_of_row_idx</span><span class="p">(</span><span class="n">n_cols</span><span class="p">,</span><span class="n">n_rows</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+<div class="viewcode-block" id="argsort_rows_of_2D_array_independently"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.argsort_rows_of_2D_array_independently">[docs]</a><span class="k">def</span> <span class="nf">argsort_rows_of_2D_array_independently</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">descending</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: will return array for row idx and one for col idex</span>
+<span class="sd">    that will sort the values of each row independently of the column</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    x = np.array([</span>
+<span class="sd">        [2,2,3,4,5],</span>
+<span class="sd">        [-2,2,3,4,5],</span>
+<span class="sd">        [3,1,1,1,1],</span>
+<span class="sd">        [1,10,10,10,10],</span>
+<span class="sd">        [3,0,1,1,1],</span>
+<span class="sd">        [-2,-3,3,4,5]</span>
+<span class="sd">         ])</span>
+<span class="sd">         </span>
+<span class="sd">    row_idx,col_idx = nu.argsort_rows_of_2D_array_independently(x)</span>
+<span class="sd">    x[row_idx,col_idx]</span>
+<span class="sd">    </span>
+<span class="sd">    Output:</span>
+<span class="sd">    &gt;&gt;</span>
+<span class="sd">    array([[ 2,  2,  3,  4,  5],</span>
+<span class="sd">       [-2,  2,  3,  4,  5],</span>
+<span class="sd">       [ 1,  1,  1,  1,  3],</span>
+<span class="sd">       [ 1, 10, 10, 10, 10],</span>
+<span class="sd">       [ 0,  1,  1,  1,  3],</span>
+<span class="sd">       [-3, -2,  3,  4,  5]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row_idx</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">matrix_of_row_idx</span><span class="p">(</span><span class="o">*</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">col_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">k</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">descending</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">array</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">row_idx</span><span class="p">,</span><span class="n">col_idx</span></div>
+
+
+
+<div class="viewcode-block" id="remove_nans"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.remove_nans">[docs]</a><span class="k">def</span> <span class="nf">remove_nans</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">array</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="all_directed_choose_2_combinations"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.all_directed_choose_2_combinations">[docs]</a><span class="k">def</span> <span class="nf">all_directed_choose_2_combinations</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ex: </span>
+<span class="sd">    seg_split_ids = [&quot;864691136388279671_0&quot;,</span>
+<span class="sd">                &quot;864691135403726574_0&quot;,</span>
+<span class="sd">                &quot;864691136194013910_0&quot;]</span>
+<span class="sd">                </span>
+<span class="sd">    output: </span>
+<span class="sd">    [[&#39;864691136388279671_0&#39;, &#39;864691135403726574_0&#39;],</span>
+<span class="sd">     [&#39;864691136388279671_0&#39;, &#39;864691136194013910_0&#39;],</span>
+<span class="sd">     [&#39;864691135403726574_0&#39;, &#39;864691136388279671_0&#39;],</span>
+<span class="sd">     [&#39;864691135403726574_0&#39;, &#39;864691136194013910_0&#39;],</span>
+<span class="sd">     [&#39;864691136194013910_0&#39;, &#39;864691136388279671_0&#39;],</span>
+<span class="sd">     [&#39;864691136194013910_0&#39;, &#39;864691135403726574_0&#39;]]</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">combs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">array</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">array</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span><span class="p">:</span> 
+                <span class="k">continue</span>
+            <span class="n">combs</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">])</span>
+            
+    <span class="k">return</span> <span class="n">combs</span></div>
+
+
+<div class="viewcode-block" id="interpercentile_range"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.interpercentile_range">[docs]</a><span class="k">def</span> <span class="nf">interpercentile_range</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">range_percentage</span><span class="p">,</span><span class="n">axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    range_percentage should be 50 or 90 (not 0.5 or 0.9)</span>
+<span class="sd">    </span>
+<span class="sd">    Purpose: To compute the range that extends from</span>
+<span class="sd">    (1-range_percentage)/2 to 0.5 + range_percentage/2</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    interpercentile_range(np.vstack([np.arange(1,11),</span>
+<span class="sd">                                np.arange(1,11),</span>
+<span class="sd">                                np.arange(1,11)]),90,verbose = True,axis = 1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lower_perc</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="o">-</span><span class="n">range_percentage</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">upper_perc</span> <span class="o">=</span> <span class="mi">50</span> <span class="o">+</span> <span class="n">range_percentage</span><span class="o">/</span><span class="mi">2</span>
+    
+    <span class="n">lower_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">lower_perc</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">upper_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">upper_perc</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    
+    <span class="n">interpercentile_range</span> <span class="o">=</span> <span class="n">upper_n</span> <span class="o">-</span> <span class="n">lower_n</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lower_n = </span><span class="si">{</span><span class="n">lower_n</span><span class="si">}</span><span class="s2"> (lower_perc = </span><span class="si">{</span><span class="n">lower_perc</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;upper_n = </span><span class="si">{</span><span class="n">upper_n</span><span class="si">}</span><span class="s2"> (upper_perc = </span><span class="si">{</span><span class="n">upper_perc</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;interpercentile_range = </span><span class="si">{</span><span class="n">interpercentile_range</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">interpercentile_range</span></div>
+
+<div class="viewcode-block" id="randomly_shuffle_array"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.randomly_shuffle_array">[docs]</a><span class="k">def</span> <span class="nf">randomly_shuffle_array</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+<div class="viewcode-block" id="random_shuffled_indexes_for_array"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.random_shuffled_indexes_for_array">[docs]</a><span class="k">def</span> <span class="nf">random_shuffled_indexes_for_array</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="n">idx_to_process</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">nu</span><span class="o">.</span><span class="n">randomly_shuffle_array</span><span class="p">(</span><span class="n">idx_to_process</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="all_choose_1_combinations_form_dict_values"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.numpy_ml.all_choose_1_combinations_form_dict_values">[docs]</a><span class="k">def</span> <span class="nf">all_choose_1_combinations_form_dict_values</span><span class="p">(</span><span class="n">parameter_dict</span><span class="p">,</span>
+                                        <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To generate a list of dictinoaries that </span>
+<span class="sd">    encompass all the possible parameter settings defined</span>
+<span class="sd">    by the possible parameter settings in the dictionary</span>
+<span class="sd">    </span>
+<span class="sd">    Pseudocode: </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">param_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">parameter_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">total_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">nu</span><span class="o">.</span><span class="n">convert_to_array_like</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parameter_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="n">all_param_comb</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">total_list</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# of combinations = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_param_comb</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">param_keys</span><span class="p">,</span><span class="n">l</span><span class="p">)}</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">all_param_comb</span><span class="p">]</span></div>
+
+
+
+
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">numpy_ml</span> <span class="k">as</span> <span class="n">nu</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
