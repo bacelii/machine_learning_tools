@@ -231,10 +231,10 @@ def pairwise_hist2D(
 #--- from machine_learning_tools ---
 from . import pandas_ml as pdml
 
-#--- from python_tools ---
-from python_tools import matplotlib_utils as mu
-from python_tools import numpy_utils as nu
-from python_tools import pandas_utils as pu
-from python_tools import statistics_utils as stu
+#--- from datasci_tools ---
+from datasci_tools import matplotlib_utils as mu
+from datasci_tools import numpy_utils as nu
+from datasci_tools import pandas_utils as pu
+from datasci_tools import statistics_utils as stu
 
 from . import seaborn_ml as sml

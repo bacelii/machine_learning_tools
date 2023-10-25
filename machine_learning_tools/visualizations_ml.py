@@ -374,7 +374,7 @@ def plot_df_scatter_2d_classification(
         y = y[y != "Unknown"],
     )
 
-    from python_tools import matplotlib_utils as mu
+    from datasci_tools import matplotlib_utils as mu
     mu.set_legend_outside_plot(ax)
     
     """
@@ -448,7 +448,7 @@ def plot_df_scatter_2d_classification(
     y = y[y != "Unknown"],
     )
 
-    from python_tools import matplotlib_utils as mu
+    from datasci_tools import matplotlib_utils as mu
     ax = mu.set_legend_outside_plot(ax)
     """
     
@@ -922,9 +922,9 @@ from . import sklearn_models as sklm
 plot_confusion_matrix = emu.plot_confusion_matrix
     
 
-#--- from python_tools ---
-from python_tools import matplotlib_utils as mu
-from python_tools import numpy_utils as nu
-from python_tools import pandas_utils as pu
+#--- from datasci_tools ---
+from datasci_tools import matplotlib_utils as mu
+from datasci_tools import numpy_utils as nu
+from datasci_tools import pandas_utils as pu
 
 from . import visualizations_ml as vml

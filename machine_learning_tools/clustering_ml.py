@@ -1104,9 +1104,9 @@ def gmm_pipeline(df,
 #--- from machine_learning_tools ---
 from . import dimensionality_reduction_utils as dru
 
-#--- from python_tools ---
-from python_tools import matplotlib_utils as mu
-from python_tools import networkx_utils as xu
-from python_tools import pandas_utils as pu
+#--- from datasci_tools ---
+from datasci_tools import matplotlib_utils as mu
+from datasci_tools import networkx_utils as xu
+from datasci_tools import pandas_utils as pu
 
 from . import clustering_ml as clu

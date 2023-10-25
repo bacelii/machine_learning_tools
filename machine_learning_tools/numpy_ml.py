@@ -241,7 +241,7 @@ def sort_multidim_array_by_rows(edge_array,order_row_items=False,):
     (with possibly sorting the individual elements along a row)
     
     Example: On how to get sorted edges
-    from python_tools import numpy_utils as nu
+    from datasci_tools import numpy_utils as nu
     nu = reload(nu)
     nu.sort_multidim_array_by_rows(limb_concept_network.edges(),order_row_items=True)
     
@@ -511,7 +511,7 @@ def mode_1d(array):
 def all_subarrays (l): 
     """
     Ex: 
-    from python_tools import numpy_utils as nu
+    from datasci_tools import numpy_utils as nu
     nu.all_subarrays([[1,"a"],[2,"b"],[3,"c"]])
     
     Output:
@@ -543,7 +543,7 @@ def random_2D_subarray(array,n_samples,
     a 2D array
     
     Ex: 
-    from python_tools import numpy_utils as nu
+    from datasci_tools import numpy_utils as nu
     import numpy as np
 
     y = np.array([[1,3],[3,2],[5,6]])
@@ -564,7 +564,7 @@ def array_split(array,n_splits):
     """Split an array into multiple sub-arrays
     
     Ex: 
-    from python_tools import numpy_utils as nu
+    from datasci_tools import numpy_utils as nu
     nu.array_split(np.arange(0,10),3)
     """
     return np.array_split(array,n_splits)
@@ -664,7 +664,7 @@ def polyfit(x,y,degree):
 def weighted_average(array,weights):
     """
     Ex: 
-    from python_tools import numpy_utils as nu
+    from datasci_tools import numpy_utils as nu
     nu.weighted_average(d_widths,d_sk_lengths)
     """
     return np.average(array,weights=weights)
@@ -808,7 +808,7 @@ def divide_data_into_classes(classes_array,data_array,unique_classes=None):
 def concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D(arrays):
     """
     Example: 
-    from python_tools import numpy_utils as nu
+    from datasci_tools import numpy_utils as nu
     arrays = [np.array([1,2,3]), np.array([4,5,6])]
     nu.concatenate_arrays_along_last_axis_after_upgraded_to_at_least_2D(arrays)
     

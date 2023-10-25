@@ -97,8 +97,8 @@ def plot_confusion_matrix(
     
 
 
-#--- from python_tools ---
-from python_tools import matplotlib_utils as mu
-from python_tools import pandas_utils as pu
+#--- from datasci_tools ---
+from datasci_tools import matplotlib_utils as mu
+from datasci_tools import pandas_utils as pu
 
 from . import evaluation_metrics_utils as emu

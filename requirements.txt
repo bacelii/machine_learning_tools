@@ -14,4 +14,4 @@ trimesh>=3.9.0
 umap_learn>=0.5.3
 webcolors>=1.11.1
 ipython_genutils
-python_tools @ git+https://git@github.com/bacelii/python_tools.git
+datasci_tools @ git+https://git@github.com/bacelii/datasci_tools.git

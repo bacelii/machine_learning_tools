@@ -212,7 +212,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ListedColormap
 from sklearn import neighbors, datasets
-from python_tools import matplotlib_utils as mu
+from datasci_tools import matplotlib_utils as mu
 def kNN_classifier(
     X, #input features
     y, #output label (in 0,1,2...)
@@ -288,7 +288,7 @@ def kNN_classifier(
     return clf
 
 
-from python_tools import numpy_utils as nu    
+from datasci_tools import numpy_utils as nu    
 def plot_classifier_map(
     clf,
     data_to_plot=None,
@@ -410,7 +410,7 @@ def plot_classifier_map(
 
     plt.show()
 
-from python_tools import system_utils as su
+from datasci_tools import system_utils as su
 def export_model(model,path):
     su.compressed_pickle(model,path)
 

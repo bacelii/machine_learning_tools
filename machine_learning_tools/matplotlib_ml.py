@@ -303,7 +303,7 @@ def convert_dict_rgb_values_to_names(color_dict):
     neuron plotting function
     
     Example: 
-    from python_tools import matplotlib_utils as mu
+    from datasci_tools import matplotlib_utils as mu
     mu = reload(mu)
     nviz=reload(nviz)
 
@@ -347,7 +347,7 @@ def plot_color_dict(colors,sorted_names=None,
     mu.plot_color_dict(mu.base_colors_dict,hue_sort=True,figure_height=20)
     
     How to plot colors returned from the plotting function:
-    from python_tools import matplotlib_utils as mu
+    from datasci_tools import matplotlib_utils as mu
     mu = reload(mu)
     nviz=reload(nviz)
 
