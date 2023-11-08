@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>machine_learning_tools.machine_learning_utils &mdash; machine-learning-tools  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            machine-learning-tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">machine_learning_tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">machine-learning-tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">machine_learning_tools.machine_learning_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for machine_learning_tools.machine_learning_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ---------- Decision Trees ------------ #</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span> <span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span> <span class="c1">#helps with splitting data</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span> <span class="c1">#will help with calculating accuracy</span>
+
+<div class="viewcode-block" id="decision_tree_sklearn"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.decision_tree_sklearn">[docs]</a><span class="k">def</span> <span class="nf">decision_tree_sklearn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
+                          <span class="n">target_column</span><span class="p">,</span>
+                         <span class="n">feature_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">perform_testing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">test_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                          
+                          <span class="c1"># parameters for the decision tree</span>
+                            <span class="n">criterion</span> <span class="o">=</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="c1"># entropy for infromation gain, gini fro gini index</span>
+                            <span class="n">splitter</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="c1">#For the splitt strategy,also can be &quot;random&quot;</span>
+                            <span class="n">max_depth</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">max_features</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">min_samples_split</span><span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+                            <span class="n">min_samples_leaf</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+                          
+                         <span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To train a decision tree</span>
+<span class="sd">    based on a dataframe with the features and the classifications</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    max_depth = If None then the depth is chosen so all leaves contin less than min_samples_split</span>
+<span class="sd">                            The higher the depth th emore overfitting</span>
+
+
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">feature_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">feature_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">feature_columns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">target_column</span><span class="p">)</span>
+        
+    
+    <span class="n">col_names</span> <span class="o">=</span> <span class="n">feature_columns</span>
+    
+    <span class="c1">#1) dividing out the data into features and classifications</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_names</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">target_column</span><span class="p">]]</span>
+    
+    
+    <span class="c1">#2) Dividing the data into test and training set</span>
+    <span class="n">test_size</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">test_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span>
+
+        
+        
+    
+    <span class="c1">#3) Train the classifier</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
+                                <span class="n">splitter</span><span class="o">=</span><span class="n">splitter</span><span class="p">,</span>
+                                <span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span><span class="p">,</span>
+                                <span class="n">max_features</span><span class="o">=</span><span class="n">max_features</span><span class="p">,</span>
+                                 <span class="n">min_samples_split</span><span class="o">=</span><span class="n">min_samples_split</span><span class="p">,</span>
+                                 <span class="n">min_samples_leaf</span><span class="o">=</span><span class="n">min_samples_leaf</span>
+                                <span class="p">)</span>
+
+    <span class="c1"># training the model</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+
+    
+    <span class="k">if</span> <span class="n">perform_testing</span> <span class="ow">and</span> <span class="n">test_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1">#testing the trained model</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+        <span class="c1">#measure the accuracy</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accuracy:&quot;</span><span class="p">,</span><span class="n">metrics</span><span class="o">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">clf</span></div>
+
+<span class="c1"># How to visualize tree </span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span>
+<span class="kn">from</span> <span class="nn">graphviz</span> <span class="kn">import</span> <span class="n">Source</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>   
+
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">export_graphviz</span>
+
+<div class="viewcode-block" id="plot_decision_tree"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.plot_decision_tree">[docs]</a><span class="k">def</span> <span class="nf">plot_decision_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span>
+                      <span class="n">feature_names</span><span class="p">,</span>
+                      <span class="n">class_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will show the </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">class_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">class_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span>
+    
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span><span class="n">export_graphviz</span><span class="p">(</span><span class="n">clf</span>
+      <span class="p">,</span> <span class="n">out_file</span><span class="o">=</span><span class="kc">None</span>
+      <span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="n">feature_names</span>
+      <span class="p">,</span> <span class="n">class_names</span><span class="o">=</span><span class="n">class_names</span>
+      <span class="p">,</span> <span class="n">filled</span> <span class="o">=</span> <span class="kc">True</span>
+      <span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;clf.classes_ = </span><span class="si">{</span><span class="n">clf</span><span class="o">.</span><span class="n">classes_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">SVG</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;svg&#39;</span><span class="p">)))</span></div>
+    
+    
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="viewcode-block" id="print_tree_structure_description"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.print_tree_structure_description">[docs]</a><span class="k">def</span> <span class="nf">print_tree_structure_description</span><span class="p">(</span><span class="n">clf</span><span class="p">):</span>
+    <span class="n">n_nodes</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">node_count</span>
+    <span class="n">children_left</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_left</span>
+    <span class="n">children_right</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_right</span>
+    <span class="n">feature</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span>
+    
+    
+<span class="c1">#     if feature_names is None:</span>
+<span class="c1">#         feature = clf.tree_.feature</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         feature = feature_names</span>
+        
+        
+    <span class="n">threshold</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">threshold</span>
+
+    <span class="n">node_depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">is_leaves</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>  <span class="c1"># start with the root node id (0) and its depth (0)</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># `pop` ensures each node is only visited once</span>
+        <span class="n">node_id</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">node_depth</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">depth</span>
+
+        <span class="c1"># If the left and right child of a node is not the same we have a split</span>
+        <span class="c1"># node</span>
+        <span class="n">is_split_node</span> <span class="o">=</span> <span class="n">children_left</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">!=</span> <span class="n">children_right</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span>
+        <span class="c1"># If a split node, append left and right children and depth to `stack`</span>
+        <span class="c1"># so we can loop through them</span>
+        <span class="k">if</span> <span class="n">is_split_node</span><span class="p">:</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">children_left</span><span class="p">[</span><span class="n">node_id</span><span class="p">],</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">children_right</span><span class="p">[</span><span class="n">node_id</span><span class="p">],</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">is_leaves</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The binary tree structure has </span><span class="si">{n}</span><span class="s2"> nodes and has &quot;</span>
+          <span class="s2">&quot;the following tree structure:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n_nodes</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">is_leaves</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{space}</span><span class="s2">node=</span><span class="si">{node}</span><span class="s2"> is a leaf node.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">space</span><span class="o">=</span><span class="n">node_depth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{space}</span><span class="s2">node=</span><span class="si">{node}</span><span class="s2"> is a split node: &quot;</span>
+                  <span class="s2">&quot;go to node </span><span class="si">{left}</span><span class="s2"> if X[:, </span><span class="si">{feature}</span><span class="s2">] &lt;= </span><span class="si">{threshold}</span><span class="s2"> &quot;</span>
+                  <span class="s2">&quot;else to node </span><span class="si">{right}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                      <span class="n">space</span><span class="o">=</span><span class="n">node_depth</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
+                      <span class="n">node</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                      <span class="n">left</span><span class="o">=</span><span class="n">children_left</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                      <span class="n">feature</span><span class="o">=</span><span class="n">feature</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                      <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                      <span class="n">right</span><span class="o">=</span><span class="n">children_right</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span></div>
+
+            
+<div class="viewcode-block" id="decision_tree_analysis"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.decision_tree_analysis">[docs]</a><span class="k">def</span> <span class="nf">decision_tree_analysis</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
+                          <span class="n">target_column</span><span class="p">,</span>
+                          <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To perform decision tree analysis and plot it</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feature_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">feature_columns</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">target_column</span><span class="p">)</span>
+
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">mlu</span><span class="o">.</span><span class="n">decision_tree_sklearn</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+                              <span class="n">target_column</span><span class="o">=</span><span class="n">target_column</span><span class="p">,</span>
+                             <span class="n">feature_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">perform_testing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">test_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+
+                              <span class="c1"># parameters for the decision tree</span>
+                                <span class="n">criterion</span> <span class="o">=</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="c1"># entropy for infromation gain, gini fro gini index</span>
+                                <span class="n">splitter</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="c1">#For the splitt strategy,also can be &quot;random&quot;</span>
+                                <span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span><span class="p">,</span>
+                                <span class="n">max_features</span> <span class="o">=</span> <span class="n">max_features</span><span class="p">,</span>
+                                <span class="n">min_samples_split</span><span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+                                <span class="n">min_samples_leaf</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span>
+
+                             <span class="p">)</span>
+    <span class="n">mlu</span><span class="o">.</span><span class="n">plot_decision_tree</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span>
+                       <span class="n">feature_names</span><span class="o">=</span><span class="n">feature_columns</span><span class="p">,</span>
+                      <span class="p">)</span></div>
+    
+    
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span>
+<div class="viewcode-block" id="encode_labels_as_ints"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.encode_labels_as_ints">[docs]</a><span class="k">def</span> <span class="nf">encode_labels_as_ints</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will convert a list of labels into </span>
+<span class="sd">    an array encoded 0,1,2.... and return the unique</span>
+<span class="sd">    labels used</span>
+<span class="sd">    </span>
+<span class="sd">    Reference: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    import machine_learning_utils as mlu</span>
+<span class="sd">    mlu.encode_labels_as_ints([&quot;hi&quot;,&quot;hello&quot;,&quot;yo&quot;,&#39;yo&#39;])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">le</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">LabelEncoder</span><span class="p">()</span>
+    <span class="n">le</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">le</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span><span class="n">le</span><span class="o">.</span><span class="n">classes_</span></div>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">neighbors</span><span class="p">,</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">datasci_tools</span> <span class="kn">import</span> <span class="n">matplotlib_utils</span> <span class="k">as</span> <span class="n">mu</span>
+<div class="viewcode-block" id="kNN_classifier"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.kNN_classifier">[docs]</a><span class="k">def</span> <span class="nf">kNN_classifier</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="c1">#input features</span>
+    <span class="n">y</span><span class="p">,</span> <span class="c1">#output label (in 0,1,2...)</span>
+    <span class="n">n_neighbors</span><span class="p">,</span>
+    <span class="n">labels_list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="c1">#other is uniform</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    
+    <span class="c1">#for plotting features</span>
+    <span class="n">plot_map</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">add_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    
+    <span class="o">**</span><span class="n">kwargs</span>
+    
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: Will create a kNN classifier and </span>
+<span class="sd">    preferrencially plot the decision map</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: Running it on the iris data</span>
+<span class="sd">    </span>
+<span class="sd">    from sklearn import neighbors, datasets</span>
+<span class="sd">    import machine_learning_utils as mlu</span>
+
+<span class="sd">    n_neighbors = 15</span>
+
+<span class="sd">    # import some data to play with</span>
+<span class="sd">    iris = datasets.load_iris()</span>
+
+<span class="sd">    # we only take the first two features. We could avoid this ugly</span>
+<span class="sd">    # slicing by using a two-dim dataset</span>
+<span class="sd">    X = iris.data[:, :2]</span>
+<span class="sd">    y = iris.target</span>
+
+<span class="sd">    mlu.kNN_classifier(X,y,</span>
+<span class="sd">                       n_neighbors=n_neighbors,</span>
+<span class="sd">                      labels_list = iris.target_names,</span>
+<span class="sd">                       plot_map = True,</span>
+<span class="sd">                       feature_1_name=iris.feature_names[0],</span>
+<span class="sd">                       feature_2_name=iris.feature_names[1],</span>
+<span class="sd">                      )</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">labels_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">labels_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;type_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">)])</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;int&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">labels_list</span> <span class="o">=</span> <span class="n">mlu</span><span class="o">.</span><span class="n">encode_labels_as_ints</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">lab</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels_list</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">lab</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        
+    <span class="c1"># we create an instance of Neighbours Classifier and fit the data.</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;X.shape = </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, y.shape = </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">add_labels</span><span class="p">:</span>
+        <span class="n">clf</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels_list</span>
+
+    <span class="k">if</span> <span class="n">plot_map</span><span class="p">:</span>
+        <span class="n">mlu</span><span class="o">.</span><span class="n">plot_classifier_map</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">clf</span></div>
+
+
+<span class="kn">from</span> <span class="nn">datasci_tools</span> <span class="kn">import</span> <span class="n">numpy_utils</span> <span class="k">as</span> <span class="n">nu</span>    
+<div class="viewcode-block" id="plot_classifier_map"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.plot_classifier_map">[docs]</a><span class="k">def</span> <span class="nf">plot_classifier_map</span><span class="p">(</span>
+    <span class="n">clf</span><span class="p">,</span>
+    <span class="n">data_to_plot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_to_plot_color</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span><span class="p">,</span>
+    <span class="n">data_to_plot_size</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="n">map_fill_colors</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="c1">#[&#39;orange&#39;, &#39;cyan&#39;, &#39;cornflowerblue&#39;],</span>
+    <span class="n">scatter_colors</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="c1">#[&#39;darkorange&#39;, &#39;c&#39;, &#39;darkblue&#39;],</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="mf">.02</span><span class="p">,</span>  <span class="c1"># step size in the mesh</span>
+    <span class="n">feature_1_idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">feature_2_idx</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">feature_1_name</span> <span class="o">=</span> <span class="s2">&quot;feature_1_name&quot;</span><span class="p">,</span>
+    <span class="n">feature_2_name</span> <span class="o">=</span> <span class="s2">&quot;feature_2_name&quot;</span><span class="p">,</span>
+    <span class="n">x_min</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_min</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">plot_training_points</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data_to_plot = </span><span class="si">{</span><span class="n">data_to_plot</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">_fit_X</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">_y</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">labels_list</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">labels</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">labels_list</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">classes_</span>
+
+    <span class="c1"># Create color maps</span>
+    <span class="k">if</span> <span class="n">map_fill_colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">map_fill_colors</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">generate_non_randon_named_color_list</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels_list</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">scatter_colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scatter_colors</span> <span class="o">=</span> <span class="n">map_fill_colors</span>
+    
+    <span class="n">cmap_light</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">map_fill_colors</span><span class="p">)</span>
+    <span class="n">cmap_bold</span> <span class="o">=</span> <span class="n">scatter_colors</span>
+
+
+    <span class="k">if</span> <span class="n">x_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_min</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">feature_1_idx</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">x_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_max</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">feature_1_idx</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">y_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">feature_2_idx</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">y_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">feature_2_idx</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Plot the decision boundary. For that, we will assign a color to each</span>
+    <span class="c1"># point in the mesh [x_min, x_max]x[y_min, y_max].</span>
+    <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                         <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">h</span><span class="p">))</span>
+    <span class="c1"># collecting the mesh points into datapoints that are used for prediction</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">xx</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">yy</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span>
+
+    <span class="c1"># Put the result into a color plot</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Z</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">):</span>
+        <span class="n">labels_list</span><span class="p">,</span><span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span><span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">yy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_light</span><span class="p">)</span>
+
+
+    <span class="c1"># Plot also the training points</span>
+    <span class="k">if</span> <span class="n">plot_training_points</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels_list</span><span class="p">,</span><span class="n">cmap_bold</span><span class="p">)}</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">[:,</span> <span class="n">feature_1_idx</span><span class="p">],</span> 
+                            <span class="n">y</span><span class="o">=</span><span class="n">X</span><span class="p">[:,</span> <span class="n">feature_2_idx</span><span class="p">],</span>
+                            <span class="c1">#color=np.array(cmap_bold)[y],</span>
+                            <span class="n">hue</span><span class="o">=</span><span class="n">labels_list</span><span class="p">[</span><span class="n">y</span><span class="p">],</span>
+                            <span class="c1">#palette=cmap_bold, </span>
+                            <span class="n">palette</span> <span class="o">=</span> <span class="n">palette</span><span class="p">,</span>
+                            <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> 
+                            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels_list</span><span class="p">,</span><span class="n">cmap_bold</span><span class="p">)}</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">[:,</span> <span class="n">feature_1_idx</span><span class="p">],</span> 
+                            <span class="n">y</span><span class="o">=</span><span class="n">X</span><span class="p">[:,</span> <span class="n">feature_2_idx</span><span class="p">],</span>
+                            <span class="c1">#color=np.array(cmap_bold)[y],</span>
+                            <span class="n">hue</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+                            <span class="c1">#palette=cmap_bold, </span>
+                            <span class="n">palette</span> <span class="o">=</span> <span class="n">palette</span><span class="p">,</span>
+                            <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> 
+                            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        
+    
+    <span class="k">if</span> <span class="n">data_to_plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_to_plot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_to_plot</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">data_to_plot_color</span><span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">convert_to_array_like</span><span class="p">(</span><span class="n">data_to_plot_color</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_to_plot_color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">data_to_plot_color</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_to_plot_color</span><span class="p">)</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">data_to_plot</span><span class="p">)</span>
+        <span class="c1">#print(f&quot;data_to_plot_color = {data_to_plot_color}&quot;)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_to_plot</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span>
+                   <span class="n">data_to_plot</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span>
+                   <span class="n">c</span> <span class="o">=</span> <span class="n">data_to_plot_color</span><span class="p">,</span>
+                   <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+                   <span class="n">s</span> <span class="o">=</span> <span class="n">data_to_plot_size</span><span class="p">,</span>
+                   <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attempting to plot data&quot;</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xx</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">yy</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">yy</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">labels_list</span><span class="p">)</span><span class="si">}</span><span class="s2">-Class classification&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">feature_1_name</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">feature_2_name</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameters for the model = </span><span class="si">{</span><span class="n">clf</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<span class="kn">from</span> <span class="nn">datasci_tools</span> <span class="kn">import</span> <span class="n">system_utils</span> <span class="k">as</span> <span class="n">su</span>
+<div class="viewcode-block" id="export_model"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.export_model">[docs]</a><span class="k">def</span> <span class="nf">export_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">su</span><span class="o">.</span><span class="n">compressed_pickle</span><span class="p">(</span><span class="n">model</span><span class="p">,</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.load_model">[docs]</a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">su</span><span class="o">.</span><span class="n">decompress_pickle</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="predict_class_single_datapoint"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.machine_learning_utils.predict_class_single_datapoint">[docs]</a><span class="k">def</span> <span class="nf">predict_class_single_datapoint</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span>
+                                  <span class="n">data</span><span class="p">,</span>
+                                  <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">return_probability</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To predict the class of a single datapoint</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    data = [1,1]</span>
+<span class="sd">    mlu.predict_class_single_datapoint(clf,data,verbose = True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pred_class</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pred_prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class = </span><span class="si">{</span><span class="n">pred_class</span><span class="si">}</span><span class="s2"> for data = </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> with prediction probability </span><span class="si">{</span><span class="n">pred_prob</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">return_probability</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pred_class</span><span class="p">,</span><span class="n">pred_prob</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pred_class</span></div>
+    
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">machine_learning_utils</span> <span class="k">as</span> <span class="n">mlu</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

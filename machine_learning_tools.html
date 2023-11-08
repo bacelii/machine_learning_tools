@@ -137,6 +137,19 @@
 <li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.hyperparameters_ml.best_hyperparams_RandomizedSearchCV"><code class="docutils literal notranslate"><span class="pre">best_hyperparams_RandomizedSearchCV()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-machine_learning_tools.machine_learning_utils">machine_learning_tools.machine_learning_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.decision_tree_analysis"><code class="docutils literal notranslate"><span class="pre">decision_tree_analysis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.decision_tree_sklearn"><code class="docutils literal notranslate"><span class="pre">decision_tree_sklearn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.encode_labels_as_ints"><code class="docutils literal notranslate"><span class="pre">encode_labels_as_ints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.export_model"><code class="docutils literal notranslate"><span class="pre">export_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.kNN_classifier"><code class="docutils literal notranslate"><span class="pre">kNN_classifier()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.load_model"><code class="docutils literal notranslate"><span class="pre">load_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.plot_classifier_map"><code class="docutils literal notranslate"><span class="pre">plot_classifier_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.plot_decision_tree"><code class="docutils literal notranslate"><span class="pre">plot_decision_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.predict_class_single_datapoint"><code class="docutils literal notranslate"><span class="pre">predict_class_single_datapoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.machine_learning_utils.print_tree_structure_description"><code class="docutils literal notranslate"><span class="pre">print_tree_structure_description()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-machine_learning_tools.matplotlib_ml">machine_learning_tools.matplotlib_ml module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.matplotlib_ml.add_random_color_for_missing_labels_in_dict"><code class="docutils literal notranslate"><span class="pre">add_random_color_for_missing_labels_in_dict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.matplotlib_ml.apply_alpha_to_color_list"><code class="docutils literal notranslate"><span class="pre">apply_alpha_to_color_list()</span></code></a></li>
@@ -1033,6 +1046,105 @@ the absolute value of the <a href="#id1"><span class="problematic" id="id2">mode
 random search of a parameter map defined by a dict</p>
 <p>Source: <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_randomized_search.html#sphx-glr-auto-examples-model-selection-plot-randomized-search-py">https://scikit-learn.org/stable/auto_examples/model_selection/plot_randomized_search.html#sphx-glr-auto-examples-model-selection-plot-randomized-search-py</a></p>
 </dd></dl>
+
+</section>
+<section id="module-machine_learning_tools.machine_learning_utils">
+<span id="machine-learning-tools-machine-learning-utils-module"></span><h2>machine_learning_tools.machine_learning_utils module<a class="headerlink" href="#module-machine_learning_tools.machine_learning_utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.decision_tree_analysis">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">decision_tree_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#decision_tree_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.decision_tree_analysis" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To perform decision tree analysis and plot it</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.decision_tree_sklearn">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">decision_tree_sklearn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_testing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'entropy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_leaf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#decision_tree_sklearn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.decision_tree_sklearn" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To train a decision tree
+based on a dataframe with the features and the classifications</p>
+<p>Parameters:
+max_depth = If None then the depth is chosen so all leaves contin less than min_samples_split</p>
+<blockquote>
+<div><p>The higher the depth th emore overfitting</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.encode_labels_as_ints">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">encode_labels_as_ints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#encode_labels_as_ints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.encode_labels_as_ints" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: Will convert a list of labels into
+an array encoded 0,1,2…. and return the unique
+labels used</p>
+<p>Reference: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html">https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html</a></p>
+<p>Ex:
+import machine_learning_utils as mlu
+mlu.encode_labels_as_ints([“hi”,”hello”,”yo”,’yo’])</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.export_model">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">export_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#export_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.export_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.kNN_classifier">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">kNN_classifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'distance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#kNN_classifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.kNN_classifier" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: Will create a kNN classifier and
+preferrencially plot the decision map</p>
+<p>Ex: Running it on the iris data</p>
+<p>from sklearn import neighbors, datasets
+import machine_learning_utils as mlu</p>
+<p>n_neighbors = 15</p>
+<p># import some data to play with
+iris = datasets.load_iris()</p>
+<p># we only take the first two features. We could avoid this ugly
+# slicing by using a two-dim dataset
+X = iris.data[:, :2]
+y = iris.target</p>
+<dl>
+<dt>mlu.kNN_classifier(X,y,</dt><dd><blockquote>
+<div><p>n_neighbors=n_neighbors,</p>
+</div></blockquote>
+<dl class="simple">
+<dt>labels_list = iris.target_names,</dt><dd><p>plot_map = True,
+feature_1_name=iris.feature_names[0],
+feature_2_name=iris.feature_names[1],</p>
+</dd>
+</dl>
+<p>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.load_model">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#load_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.load_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.plot_classifier_map">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">plot_classifier_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_to_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_to_plot_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_to_plot_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(8,</span> <span class="pre">6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_fill_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_1_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_2_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_1_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'feature_1_name'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_2_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'feature_2_name'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_training_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#plot_classifier_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.plot_classifier_map" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To plot</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.plot_decision_tree">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">plot_decision_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#plot_decision_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.plot_decision_tree" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: Will show the</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.predict_class_single_datapoint">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">predict_class_single_datapoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#predict_class_single_datapoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.predict_class_single_datapoint" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To predict the class of a single datapoint</p>
+<p>Ex:
+data = [1,1]
+mlu.predict_class_single_datapoint(clf,data,verbose = True)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.machine_learning_utils.print_tree_structure_description">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.machine_learning_utils.</span></span><span class="sig-name descname"><span class="pre">print_tree_structure_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/machine_learning_utils.html#print_tree_structure_description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.machine_learning_utils.print_tree_structure_description" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-machine_learning_tools.matplotlib_ml">

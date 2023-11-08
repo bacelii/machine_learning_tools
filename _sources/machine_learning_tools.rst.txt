@@ -68,6 +68,14 @@ machine\_learning\_tools.hyperparameters\_ml module
    :undoc-members:
    :show-inheritance:
 
+machine\_learning\_tools.machine\_learning\_utils module
+--------------------------------------------------------
+
+.. automodule:: machine_learning_tools.machine_learning_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 machine\_learning\_tools.matplotlib\_ml module
 ----------------------------------------------
 
