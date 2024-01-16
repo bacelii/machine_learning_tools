@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>machine_learning_tools package &mdash; machine-learning-tools  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -122,6 +124,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-machine_learning_tools.evaluation_metrics_utils">machine_learning_tools.evaluation_metrics_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.accuracy"><code class="docutils literal notranslate"><span class="pre">accuracy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.average_and_class_accuracy"><code class="docutils literal notranslate"><span class="pre">average_and_class_accuracy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.class_accuracy"><code class="docutils literal notranslate"><span class="pre">class_accuracy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.class_accuracy_str"><code class="docutils literal notranslate"><span class="pre">class_accuracy_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.class_mean_accuracy"><code class="docutils literal notranslate"><span class="pre">class_mean_accuracy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.confusion_matrix"><code class="docutils literal notranslate"><span class="pre">confusion_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.normalize_confusion_matrix"><code class="docutils literal notranslate"><span class="pre">normalize_confusion_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#machine_learning_tools.evaluation_metrics_utils.plot_confusion_matrix"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix()</span></code></a></li>
@@ -948,6 +955,31 @@ test_data = iris.data</p>
 </section>
 <section id="module-machine_learning_tools.evaluation_metrics_utils">
 <span id="machine-learning-tools-evaluation-metrics-utils-module"></span><h2>machine_learning_tools.evaluation_metrics_utils module<a class="headerlink" href="#module-machine_learning_tools.evaluation_metrics_utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.evaluation_metrics_utils.accuracy">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.evaluation_metrics_utils.</span></span><span class="sig-name descname"><span class="pre">accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/evaluation_metrics_utils.html#accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.evaluation_metrics_utils.accuracy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.evaluation_metrics_utils.average_and_class_accuracy">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.evaluation_metrics_utils.</span></span><span class="sig-name descname"><span class="pre">average_and_class_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/evaluation_metrics_utils.html#average_and_class_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.evaluation_metrics_utils.average_and_class_accuracy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.evaluation_metrics_utils.class_accuracy">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.evaluation_metrics_utils.</span></span><span class="sig-name descname"><span class="pre">class_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/evaluation_metrics_utils.html#class_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.evaluation_metrics_utils.class_accuracy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.evaluation_metrics_utils.class_accuracy_str">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.evaluation_metrics_utils.</span></span><span class="sig-name descname"><span class="pre">class_accuracy_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/evaluation_metrics_utils.html#class_accuracy_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.evaluation_metrics_utils.class_accuracy_str" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="machine_learning_tools.evaluation_metrics_utils.class_mean_accuracy">
+<span class="sig-prename descclassname"><span class="pre">machine_learning_tools.evaluation_metrics_utils.</span></span><span class="sig-name descname"><span class="pre">class_mean_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/evaluation_metrics_utils.html#class_mean_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.evaluation_metrics_utils.class_mean_accuracy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="machine_learning_tools.evaluation_metrics_utils.confusion_matrix">
 <span class="sig-prename descclassname"><span class="pre">machine_learning_tools.evaluation_metrics_utils.</span></span><span class="sig-name descname"><span class="pre">confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/machine_learning_tools/evaluation_metrics_utils.html#confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#machine_learning_tools.evaluation_metrics_utils.confusion_matrix" title="Permalink to this definition"></a></dt>

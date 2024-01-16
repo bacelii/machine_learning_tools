@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>machine_learning_tools.evaluation_metrics_utils &mdash; machine-learning-tools  documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -166,6 +168,23 @@
 
     <span class="k">return</span> <span class="n">ax</span></div>
     
+<div class="viewcode-block" id="accuracy"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.evaluation_metrics_utils.accuracy">[docs]</a><span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">M</span><span class="p">)</span></div>
+<div class="viewcode-block" id="class_accuracy"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.evaluation_metrics_utils.class_accuracy">[docs]</a><span class="k">def</span> <span class="nf">class_accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+<div class="viewcode-block" id="class_accuracy_str"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.evaluation_metrics_utils.class_accuracy_str">[docs]</a><span class="k">def</span> <span class="nf">class_accuracy_str</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="n">labels</span><span class="p">):</span>
+    <span class="n">accuracies</span> <span class="o">=</span> <span class="n">class_accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">mystr</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span><span class="n">acc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span><span class="n">accuracies</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">mystr</span></div>
+<div class="viewcode-block" id="class_mean_accuracy"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.evaluation_metrics_utils.class_mean_accuracy">[docs]</a><span class="k">def</span> <span class="nf">class_mean_accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="n">accuracies</span> <span class="o">=</span> <span class="n">class_accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">accuracies</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="average_and_class_accuracy"><a class="viewcode-back" href="../../machine_learning_tools.html#machine_learning_tools.evaluation_metrics_utils.average_and_class_accuracy">[docs]</a><span class="k">def</span> <span class="nf">average_and_class_accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="n">labels</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy = </span><span class="si">{</span><span class="n">accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="si">:</span><span class="s2">2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class Accuracies:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">class_accuracy_str</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="n">labels</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class Mean Accuracy = </span><span class="si">{</span><span class="n">class_mean_accuracy</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="si">:</span><span class="s2">2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <span class="c1">#--- from datasci_tools ---</span>
