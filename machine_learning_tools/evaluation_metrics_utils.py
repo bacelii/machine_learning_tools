@@ -95,6 +95,23 @@ def plot_confusion_matrix(
 
     return ax
     
+def accuracy(M):
+    return np.trace(M)/np.sum(M)
+def class_accuracy(M):
+    return np.diagonal(M)/np.sum(M,axis=1)
+def class_accuracy_str(M,labels):
+    accuracies = class_accuracy(M)
+    mystr = ", ".join([f"{l} ({acc:.2f})" for l,acc in zip(labels,accuracies)])
+    return mystr
+def class_mean_accuracy(M):
+    accuracies = class_accuracy(M)
+    return np.mean(accuracies)
+
+def average_and_class_accuracy(M,labels):
+    print(f"Accuracy = {accuracy(M):2f}")
+    print(f"Class Accuracies:\n")
+    print(class_accuracy_str(M,labels))
+    print(f"Class Mean Accuracy = {class_mean_accuracy(M):2f}")
 
 
 #--- from datasci_tools ---
